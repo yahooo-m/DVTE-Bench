@@ -384,8 +384,8 @@ def build(force: bool, workers: int) -> None:
     orientation_counts = Counter(row["orientation"] for row in rows)
 
     manifest = {
-        "title": "MultiType-1631",
-        "subtitle": "A Multi-Type Benchmark for Video Text Erasure",
+        "title": "DVTE-Bench",
+        "subtitle": "Diverse Video Text Erasure Benchmark",
         "version": source_summary["benchmark_version"],
         "stats": {
             "samples": len(rows),

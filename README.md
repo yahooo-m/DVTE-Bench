@@ -1,7 +1,10 @@
-# MultiType-1631 Benchmark Website
+# DVTE-Bench
 
-Static project page and interactive explorer for the MultiType-1631 video text
-erasure benchmark.
+**Diverse Video Text Erasure Benchmark** is a paired benchmark with 1,631 clips,
+136,090 frames, and 8 text types. This repository contains its static project
+page and interactive sample explorer.
+
+Project page: <https://yahooo-m.github.io/DVTE-Bench/>
 
 ## Local preview
 

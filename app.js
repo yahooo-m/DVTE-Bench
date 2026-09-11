@@ -38,7 +38,7 @@
   };
   const getTheme = () => {
     try {
-      return localStorage.getItem("multitype-theme");
+      return localStorage.getItem("dvte-bench-theme");
     } catch {
       return null;
     }
@@ -58,7 +58,7 @@
     const theme = root.dataset.theme === "dark" ? "light" : "dark";
     applyTheme(theme);
     try {
-      localStorage.setItem("multitype-theme", theme);
+      localStorage.setItem("dvte-bench-theme", theme);
     } catch {
       // Local storage may be unavailable in restricted browsing contexts.
     }
