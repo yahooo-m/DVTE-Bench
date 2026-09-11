@@ -1,0 +1,50 @@
+{
+  "benchmark_version": "multitype_synth_v4_vlm_asr_ocr_clean",
+  "candidate_count": 2200,
+  "generated_count": 1631,
+  "known_train_overlap_count": 68,
+  "languages": {
+    "cy": 1,
+    "en": 350,
+    "es": 1,
+    "it": 2,
+    "ja": 178,
+    "ko": 201,
+    "mixed": 1,
+    "pl": 1,
+    "pt": 1,
+    "th": 50,
+    "zh": 845
+  },
+  "leakage_warning": "68 asr_preview_seen samples overlap a known training manifest and must be reported as a seen regression track.",
+  "metadata_sha256": "58ef44193b654089b2f1d5d0314356592da5dd40f2cb3bd48417070408aef965",
+  "ocr_artifacts": {
+    "clean": "ocr_clean_1631.csv",
+    "rejected": "ocr_rejected_569.csv",
+    "results": "ocr_results_all_candidates.jsonl",
+    "results_sha256": "37a56c367db3b9a4246da1751e01ee7b7662e818402d51d85637cc04b684c669"
+  },
+  "ocr_config_hash": "955d7878c725369b366eaa1ac92955cacb20d17059433d78f998869ca525be0c",
+  "ocr_rejected_count": 569,
+  "orientations": {
+    "landscape": 546,
+    "portrait": 1085
+  },
+  "storage": "binary artifacts are hard-linked from source benchmarks where supported",
+  "target_policy": "all target frames OCR scanned; any confirmed text rejects the sample",
+  "text_plan_sha256": "bdf2ceed52a3fee9f8f89bd181225da640df5977b65c1e8b158fdfd6fb119411",
+  "tracks": {
+    "asr_preview_seen": 68,
+    "vlm_multitype": 1563
+  },
+  "types": {
+    "artistic_title": 218,
+    "asr_subtitle": 68,
+    "moving_text": 232,
+    "multi_region": 225,
+    "non_bottom_layout": 223,
+    "persistent_watermark": 218,
+    "standard_subtitle": 232,
+    "vertical_text": 215
+  }
+}

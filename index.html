@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MultiType-1631 is a paired benchmark for video text erasure.">
+  <meta name="theme-color" content="#f4f6f8">
+  <title>MultiType-1631 | Video Text Erasure Benchmark</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="assets/vendor/lucide.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" data-header>
+    <nav class="nav shell" aria-label="Primary navigation">
+      <a class="wordmark" href="#top" aria-label="MultiType-1631 home">
+        <span class="wordmark-mark" aria-hidden="true">M</span>
+        <span>MultiType-1631</span>
+        <span class="version-chip">Benchmark</span>
+      </a>
+      <button class="icon-button mobile-menu-button" type="button" data-menu-toggle
+        aria-label="Open navigation" aria-expanded="false" aria-controls="nav-links">
+        <i data-lucide="menu" aria-hidden="true"></i>
+      </button>
+      <div class="nav-links" id="nav-links" data-nav-links>
+        <a href="#overview">Overview</a>
+        <a href="#taxonomy">Taxonomy</a>
+        <a href="#explorer">Explorer</a>
+        <a href="#protocol">Protocol</a>
+        <a href="#data">Data</a>
+      </div>
+      <button class="icon-button theme-button" type="button" data-theme-toggle
+        aria-label="Switch to dark theme" title="Toggle color theme">
+        <i data-lucide="moon" aria-hidden="true"></i>
+      </button>
+    </nav>
+  </header>
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <video class="hero-video" muted autoplay loop playsinline preload="metadata"
+        poster="assets/posters/case-03-source.jpg" aria-hidden="true">
+        <source src="assets/videos/case-03-source.mp4" type="video/mp4">
+      </video>
+      <div class="hero-overlay" aria-hidden="true"></div>
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="shell hero-copy">
+        <p class="eyebrow">Video Text Erasure Benchmark</p>
+        <h1 id="hero-title">MultiType-1631</h1>
+        <p class="hero-subtitle">
+          Paired source, clean target, and frame-aligned masks across the text layouts
+          that break conventional subtitle erasers.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#explorer">
+            <i data-lucide="play" aria-hidden="true"></i> Explore samples
+          </a>
+          <a class="button button-secondary" href="data/benchmark_manifest.csv" download>
+            <i data-lucide="table-2" aria-hidden="true"></i> Manifest
+          </a>
+          <a class="button button-secondary" href="data/summary.json" download>
+            <i data-lucide="file-json-2" aria-hidden="true"></i> Summary
+          </a>
+        </div>
+        <div class="hero-tags" aria-label="Dataset properties">
+          <span>Paired supervision</span>
+          <span>Frame-level masks</span>
+          <span>OCR-audited targets</span>
+          <span>Portrait + landscape</span>
+        </div>
+      </div>
+      <div class="hero-caption">
+        <span>Live benchmark sample</span>
+        <span>Source with artistic title</span>
+      </div>
+    </section>
+
+    <section class="metric-band" aria-label="Benchmark summary">
+      <div class="shell metric-grid">
+        <div class="metric">
+          <strong data-stat="samples">1,631</strong>
+          <span>Paired clips</span>
+          <small>Source, target, and mask</small>
+        </div>
+        <div class="metric">
+          <strong data-stat="types">8</strong>
+          <span>Text types</span>
+          <small>Layout, motion, and style stressors</small>
+        </div>
+        <div class="metric">
+          <strong data-stat="frames">136,090</strong>
+          <span>Video frames</span>
+          <small>Frame-aligned evaluation data</small>
+        </div>
+        <div class="metric">
+          <strong data-stat="minutes">91.1</strong>
+          <span>Minutes</span>
+          <small>All clips include audio</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="overview" aria-labelledby="overview-title">
+      <div class="shell overview-layout">
+        <div class="section-heading left reveal">
+          <p class="eyebrow">Overview</p>
+          <h2 id="overview-title">Evaluation beyond bottom-aligned subtitles</h2>
+        </div>
+        <div class="overview-copy reveal">
+          <p class="lead">
+            MultiType-1631 isolates difficult cases hidden by aggregate scores: moving
+            overlays, vertical writing, distributed regions, title cards, persistent
+            marks, and non-bottom layouts.
+          </p>
+          <p>
+            Every source clip has a clean target and a temporally aligned mask. Target frames
+            were scanned under one OCR audit configuration; confirmed residual text caused
+            rejection. The ASR preview subset remains explicitly separated because it overlaps
+            a known training manifest.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-surface" id="taxonomy" aria-labelledby="taxonomy-title">
+      <div class="shell">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Taxonomy</p>
+          <h2 id="taxonomy-title">Eight complementary stress tests</h2>
+          <p>Each slice targets a distinct spatial, temporal, or typographic failure mode.</p>
+        </div>
+        <div class="taxonomy-grid reveal" data-taxonomy-grid aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section explorer-section" id="explorer" aria-labelledby="explorer-title">
+      <div class="shell">
+        <div class="explorer-heading reveal">
+          <div>
+            <p class="eyebrow">Interactive Explorer</p>
+            <h2 id="explorer-title">Inspect aligned evidence</h2>
+            <p>Select a case and compare source, clean target, and mask at the same timestamp.</p>
+          </div>
+          <div class="preview-count">
+            <strong data-preview-count>16</strong>
+            <span>web previews</span>
+          </div>
+        </div>
+        <div class="filter-row reveal" data-preview-filters role="tablist"
+          aria-label="Filter preview samples">
+          <button class="filter-button is-active" type="button" role="tab"
+            aria-selected="true" data-filter="all">All types</button>
+        </div>
+
+        <div class="comparison-tool reveal" data-comparison-tool>
+          <div class="comparison-topline">
+            <span class="live-label"><i aria-hidden="true"></i> Synchronized preview</span>
+            <span data-active-index>01 / 16</span>
+          </div>
+          <div class="media-grid" data-media-grid>
+            <figure class="media-panel">
+              <figcaption>Source</figcaption>
+              <video muted playsinline preload="metadata" data-preview-video="source"></video>
+            </figure>
+            <figure class="media-panel">
+              <figcaption>Clean target</figcaption>
+              <video muted playsinline preload="metadata" data-preview-video="target"></video>
+            </figure>
+            <figure class="media-panel mask-panel">
+              <figcaption>Alpha mask</figcaption>
+              <video muted playsinline preload="metadata" data-preview-video="mask"></video>
+            </figure>
+          </div>
+          <div class="transport">
+            <button class="transport-button" type="button" data-play-toggle
+              aria-label="Play synchronized preview" title="Play">
+              <i data-lucide="play" aria-hidden="true"></i>
+            </button>
+            <button class="transport-button" type="button" data-restart
+              aria-label="Restart synchronized preview" title="Restart">
+              <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+            </button>
+            <span class="timecode" data-current-time>0:00</span>
+            <input class="timeline" type="range" min="0" max="1000" value="0"
+              aria-label="Preview position" data-timeline>
+            <span class="timecode" data-duration>0:00</span>
+          </div>
+          <div class="case-caption">
+            <div>
+              <p class="case-kicker" data-case-kicker>Standard Subtitle · Landscape</p>
+              <h3 data-case-title>Loading benchmark case</h3>
+              <p class="case-text" data-case-text></p>
+            </div>
+            <dl class="case-meta" data-case-meta></dl>
+          </div>
+        </div>
+        <div class="preview-grid reveal" data-preview-grid
+          aria-label="Benchmark preview cases"></div>
+      </div>
+    </section>
+
+    <section class="section" id="composition" aria-labelledby="composition-title">
+      <div class="shell">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Composition</p>
+          <h2 id="composition-title">Balanced by challenge, explicit by split</h2>
+          <p>The main synthetic track spans all eight types; the seen ASR track is reported separately.</p>
+        </div>
+        <div class="composition-layout reveal">
+          <div class="distribution" data-category-bars aria-label="Samples by benchmark type"></div>
+          <div class="composition-summary">
+            <div class="split-stat">
+              <strong>1,085</strong>
+              <span>Portrait clips</span>
+              <small>66.5% of the benchmark</small>
+            </div>
+            <div class="split-stat">
+              <strong>546</strong>
+              <span>Landscape clips</span>
+              <small>33.5% of the benchmark</small>
+            </div>
+            <div class="split-stat accent">
+              <strong>11</strong>
+              <span>Language labels</span>
+              <small>Chinese, English, Korean, Japanese, Thai, and long-tail ASR</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-surface" id="protocol" aria-labelledby="protocol-title">
+      <div class="shell">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Protocol</p>
+          <h2 id="protocol-title">A reproducible evaluation contract</h2>
+          <p>Keep track boundaries visible and compute restoration metrics against paired clean frames.</p>
+        </div>
+        <div class="protocol-grid reveal">
+          <article>
+            <span>01</span>
+            <h3>Load paired clips</h3>
+            <p>Read source and target at native frame alignment. Use the provided mask for region metrics.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Report full + masked</h3>
+            <p>Pair whole-frame fidelity with mask-region PSNR, SSIM, LPIPS, or localized error.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Measure temporal quality</h3>
+            <p>Add a temporal or flow-aware measure so per-frame restoration cannot hide flicker.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Separate seen samples</h3>
+            <p>Report the 68 ASR preview samples as a seen regression track, never as unseen test data.</p>
+          </article>
+        </div>
+        <aside class="audit-note reveal">
+          <i data-lucide="scan-search" aria-hidden="true"></i>
+          <div>
+            <strong>Target-side OCR audit</strong>
+            <p>
+              All target frames were scanned with a fixed configuration. 569 candidates with
+              confirmed target text were rejected before the final 1,631-sample release.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section catalog-section" id="catalog" aria-labelledby="catalog-title">
+      <div class="shell">
+        <div class="catalog-heading reveal">
+          <div>
+            <p class="eyebrow">Catalog</p>
+            <h2 id="catalog-title">Search all 1,631 records</h2>
+          </div>
+          <label class="search-field">
+            <i data-lucide="search" aria-hidden="true"></i>
+            <span class="sr-only">Search benchmark records</span>
+            <input type="search" placeholder="Search ID, type, language, or text"
+              data-catalog-search>
+          </label>
+        </div>
+        <div class="catalog-toolbar reveal">
+          <label>
+            <span>Type</span>
+            <select data-catalog-type>
+              <option value="all">All types</option>
+            </select>
+          </label>
+          <label>
+            <span>Orientation</span>
+            <select data-catalog-orientation>
+              <option value="all">All orientations</option>
+              <option value="portrait">Portrait</option>
+              <option value="landscape">Landscape</option>
+            </select>
+          </label>
+          <label>
+            <span>Track</span>
+            <select data-catalog-track>
+              <option value="all">All tracks</option>
+              <option value="vlm_multitype">Main synthetic</option>
+              <option value="asr_preview_seen">ASR seen regression</option>
+            </select>
+          </label>
+          <span class="catalog-result-count" data-catalog-count>1,631 records</span>
+        </div>
+        <div class="table-wrap reveal">
+          <table>
+            <thead>
+              <tr>
+                <th>Sample</th>
+                <th>Type</th>
+                <th>Language</th>
+                <th>Format</th>
+                <th>Duration</th>
+                <th>Regions</th>
+                <th>Track</th>
+              </tr>
+            </thead>
+            <tbody data-catalog-body></tbody>
+          </table>
+        </div>
+        <div class="pagination reveal">
+          <button class="icon-button" type="button" data-page-prev
+            aria-label="Previous page" title="Previous page">
+            <i data-lucide="chevron-left" aria-hidden="true"></i>
+          </button>
+          <span data-page-label>Page 1</span>
+          <button class="icon-button" type="button" data-page-next
+            aria-label="Next page" title="Next page">
+            <i data-lucide="chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section data-section" id="data" aria-labelledby="data-title">
+      <div class="shell data-layout">
+        <div class="section-heading left reveal">
+          <p class="eyebrow">Data Package</p>
+          <h2 id="data-title">Structured for direct evaluation</h2>
+          <p>Each type repeats the same source, target, mask, and per-sample metadata layout.</p>
+          <div class="data-actions">
+            <a class="button button-primary" href="data/benchmark_manifest.csv" download>
+              <i data-lucide="download" aria-hidden="true"></i> CSV manifest
+            </a>
+            <a class="button button-secondary" href="data/benchmark.json" download>
+              <i data-lucide="braces" aria-hidden="true"></i> Web manifest
+            </a>
+          </div>
+        </div>
+        <div class="file-tree reveal" aria-label="Benchmark directory structure">
+          <div class="tree-head">
+            <span>multitype_synth_v4_vlm_asr_ocr_clean_1631/</span>
+            <i data-lucide="folder-tree" aria-hidden="true"></i>
+          </div>
+          <pre><code>metadata.csv
+summary.json
+&lt;benchmark_type&gt;/
+  metadata.csv
+  source/        # text-overlaid MP4
+  target/        # clean reference MP4
+  mask_alpha/    # visual mask MP4
+  mask_npz/      # frame-aligned masks
+  sample_meta/   # overlay provenance</code></pre>
+          <div class="hash-line">
+            <span>Metadata SHA-256</span>
+            <code data-metadata-hash>58ef4419...ef965</code>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-inner">
+      <div>
+        <strong>MultiType-1631</strong>
+        <span>Video Text Erasure Benchmark</span>
+      </div>
+      <span>Version: multitype_synth_v4_vlm_asr_ocr_clean</span>
+    </div>
+  </footer>
+  <div class="loading-status" data-loading-status role="status">
+    Loading benchmark manifest...
+  </div>
+</body>
+</html>
