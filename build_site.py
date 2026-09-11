@@ -16,6 +16,13 @@ from pathlib import Path
 
 SITE_DIR = Path(__file__).resolve().parent
 BENCHMARK_DIR = SITE_DIR.parent
+PROJECT_DIR = BENCHMARK_DIR.parent.parent
+OURS_METRICS_CSV = (
+    PROJECT_DIR
+    / "Bnechmark_test"
+    / "lingbot_40k_multitype_gtmask"
+    / "metrics_per_video.csv"
+)
 DATA_DIR = SITE_DIR / "data"
 POSTER_DIR = SITE_DIR / "assets" / "posters"
 VIDEO_DIR = SITE_DIR / "assets" / "videos"
@@ -130,6 +137,17 @@ PUBLIC_FIELDS = [
     "known_train_overlap",
     "ocr_status",
 ]
+
+RESULT_METRIC_FIELDS = (
+    "psnr",
+    "ssim",
+    "lpips",
+    "twe_pred",
+    "twe_gt",
+    "mask_psnr",
+    "mask_mae",
+    "mask_crop_ssim",
+)
 
 
 def read_rows() -> list[dict[str, str]]:
@@ -278,6 +296,95 @@ def write_public_csv(rows: list[dict[str, str]]) -> None:
             writer.writerow({field: row[field] for field in PUBLIC_FIELDS})
 
 
+def aggregate_result_metrics(rows: list[dict[str, object]]) -> dict[str, object]:
+    result: dict[str, object] = {"samples": len(rows)}
+    for field in RESULT_METRIC_FIELDS:
+        values = [float(row[field]) for row in rows]
+        finite = [value for value in values if math.isfinite(value)]
+        if not finite:
+            raise ValueError(f"No finite values for result metric: {field}")
+        result[field] = sum(finite) / len(finite)
+        if field in {"psnr", "mask_psnr"}:
+            result[f"{field}_finite_samples"] = len(finite)
+            result[f"{field}_infinite_samples"] = len(values) - len(finite)
+    return result
+
+
+def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
+    if not OURS_METRICS_CSV.is_file():
+        raise FileNotFoundError(f"Missing Ours metrics: {OURS_METRICS_CSV}")
+    with OURS_METRICS_CSV.open(encoding="utf-8", newline="") as handle:
+        metric_rows: list[dict[str, object]] = []
+        for source_row in csv.DictReader(handle):
+            row: dict[str, object] = dict(source_row)
+            for field in RESULT_METRIC_FIELDS:
+                row[field] = float(source_row[field])
+            metric_rows.append(row)
+
+    expected_names = {row["name"] for row in dataset_rows}
+    result_names = {str(row["name"]) for row in metric_rows}
+    if result_names != expected_names:
+        missing = expected_names - result_names
+        extra = result_names - expected_names
+        raise ValueError(f"Ours metric coverage mismatch: missing={len(missing)}, extra={len(extra)}")
+
+    main_rows = [row for row in metric_rows if row["benchmark_type"] != "asr_subtitle"]
+    seen_rows = [row for row in metric_rows if row["benchmark_type"] == "asr_subtitle"]
+    by_type = {
+        category: aggregate_result_metrics(
+            [row for row in metric_rows if row["benchmark_type"] == category]
+        )
+        for category in CATEGORY_ORDER
+    }
+    return {
+        "protocol": {
+            "aggregation": "Per-frame metrics are averaged per video, then macro-averaged across videos.",
+            "psnrPolicy": "Finite means exclude zero-MSE videos and report their count separately.",
+            "maskSource": "Dataset ground-truth masks reconstructed from NPZ.",
+        },
+        "methods": [
+            {
+                "id": "ours",
+                "label": "Ours",
+                "configuration": "40K checkpoint · GT mask · 6 steps",
+                "coverage": len(metric_rows),
+                "tracks": {
+                    "main": {
+                        "label": "Main test",
+                        **aggregate_result_metrics(main_rows),
+                    },
+                    "seen": {
+                        "label": "ASR seen regression",
+                        **aggregate_result_metrics(seen_rows),
+                    },
+                },
+                "byType": by_type,
+            }
+        ],
+    }
+
+
+def write_results_csv(results: dict[str, object]) -> None:
+    fields = [
+        "method",
+        "scope",
+        "samples",
+        *RESULT_METRIC_FIELDS,
+        "psnr_infinite_samples",
+        "mask_psnr_infinite_samples",
+    ]
+    rows: list[dict[str, object]] = []
+    for method in results["methods"]:
+        for track_id, metrics in method["tracks"].items():
+            rows.append({"method": method["label"], "scope": track_id, **metrics})
+        for category, metrics in method["byType"].items():
+            rows.append({"method": method["label"], "scope": category, **metrics})
+    with (DATA_DIR / "results.csv").open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 def build(force: bool, workers: int) -> None:
     for directory in (DATA_DIR, POSTER_DIR, VIDEO_DIR):
         directory.mkdir(parents=True, exist_ok=True)
@@ -382,6 +489,7 @@ def build(force: bool, workers: int) -> None:
     category_counts = Counter(row["benchmark_type"] for row in rows)
     language_counts = Counter(row["primary_language"] for row in rows)
     orientation_counts = Counter(row["orientation"] for row in rows)
+    results = load_results(rows)
 
     manifest = {
         "title": "DVTE-Bench",
@@ -409,6 +517,7 @@ def build(force: bool, workers: int) -> None:
         "languages": dict(language_counts.most_common()),
         "previews": preview_items,
         "items": all_items,
+        "results": results,
         "integrity": {
             "metadataSha256": source_summary["metadata_sha256"],
             "ocrConfigHash": source_summary["ocr_config_hash"],
@@ -420,6 +529,11 @@ def build(force: bool, workers: int) -> None:
         encoding="utf-8",
     )
     write_public_csv(rows)
+    (DATA_DIR / "results.json").write_text(
+        json.dumps(results, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    write_results_csv(results)
     shutil.copy2(summary_path, DATA_DIR / "summary.json")
     print(
         f"Built {len(preview_items)} previews and {len(all_items)} metadata rows "

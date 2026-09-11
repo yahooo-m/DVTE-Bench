@@ -118,6 +118,49 @@
       `).join("");
   };
 
+  const formatMetric = (value, digits) => Number(value).toFixed(digits);
+  const formatPsnr = (metrics, field) => {
+    const infinite = metrics[`${field}_infinite_samples`];
+    const suffix = infinite ? "†" : "";
+    return `<span title="${infinite} infinite-PSNR video${infinite === 1 ? "" : "s"}">${formatMetric(metrics[field], 2)}${suffix}</span>`;
+  };
+  const metricCells = (metrics, includeTWE = true) => `
+    <td class="result-best">${formatPsnr(metrics, "psnr")}</td>
+    <td>${formatMetric(metrics.ssim, 4)}</td>
+    <td>${formatMetric(metrics.lpips, 4)}</td>
+    ${includeTWE ? `<td>${formatMetric(metrics.twe_pred, 2)} / ${formatMetric(metrics.twe_gt, 2)}</td>` : ""}
+    <td class="result-best">${formatPsnr(metrics, "mask_psnr")}</td>
+    <td>${formatMetric(metrics.mask_mae, 2)}</td>
+    <td>${formatMetric(metrics.mask_crop_ssim, 4)}</td>
+  `;
+  const renderResults = () => {
+    const method = benchmark.results.methods[0];
+    document.querySelector("[data-result-configuration]").textContent = method.configuration;
+    document.querySelector("[data-results-overall]").innerHTML = ["main", "seen"]
+      .map((trackId) => {
+        const metrics = method.tracks[trackId];
+        return `
+          <tr>
+            <td class="result-method">${method.label}</td>
+            <td class="result-track"><strong>${metrics.label}</strong>${trackId === "seen" ? "Seen" : "Unseen"}</td>
+            <td>${formatNumber(metrics.samples)}</td>
+            ${metricCells(metrics)}
+          </tr>
+        `;
+      }).join("");
+    document.querySelector("[data-results-by-type]").innerHTML = benchmark.categories
+      .map((category) => {
+        const metrics = method.byType[category.id];
+        return `
+          <tr>
+            <td><strong>${category.label}</strong>${category.id === "asr_subtitle" ? " · seen" : ""}</td>
+            <td>${formatNumber(metrics.samples)}</td>
+            ${metricCells(metrics, false)}
+          </tr>
+        `;
+      }).join("");
+  };
+
   const renderComposition = () => {
     const maximum = Math.max(...benchmark.categories.map((category) => category.count));
     document.querySelector("[data-category-bars]").innerHTML = benchmark.categories
@@ -364,6 +407,7 @@
       benchmark = await response.json();
       renderStats();
       renderTaxonomy();
+      renderResults();
       renderComposition();
       renderFilterControls();
       populateCatalogTypes();

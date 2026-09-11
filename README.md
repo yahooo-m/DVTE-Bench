@@ -29,6 +29,8 @@ Use `--force` to regenerate existing preview media. The builder:
 - selects two representative samples per type;
 - creates aligned Source, Target, and Mask previews;
 - generates separate posters for all three preview streams.
+- exports complete Ours metrics from the 1,631-video evaluation, with the
+  1,563-video main track separated from the 68-video seen ASR regression track.
 
 The website package is intentionally small. It exposes the complete searchable
 metadata catalog but only 16 compressed media previews, rather than copying the

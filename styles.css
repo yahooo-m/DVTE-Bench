@@ -290,6 +290,45 @@ h1, h2, h3, p, figure, dl, dd, pre { margin: 0; }
 .taxonomy-item h3 { margin-top: 24px; font-family: var(--serif); font-size: 20px; line-height: 1.2; }
 .taxonomy-item p { margin-top: 9px; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .taxonomy-count { display: block; margin-top: 18px; color: var(--teal); font-size: 12px; font-weight: 750; }
+.results-section { background: var(--canvas); }
+.results-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 14px;
+}
+.method-identity { display: flex; align-items: center; gap: 12px; }
+.method-identity > div { display: grid; }
+.method-identity strong { font-size: 13px; }
+.method-identity span:not(.method-badge) { color: var(--muted); font-size: 11px; }
+.method-badge {
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: white;
+  background: var(--red);
+  font-size: 11px;
+  font-weight: 800;
+}
+.results-table { margin-top: 0; }
+.results-table table { min-width: 980px; }
+.results-table th:not(:first-child),
+.results-table td:not(:first-child) { text-align: right; }
+.results-table td { font-variant-numeric: tabular-nums; }
+.overall-results tbody tr:first-child { background: color-mix(in srgb, var(--red-soft) 55%, transparent); }
+.result-method { color: var(--red); font-weight: 800; }
+.result-track { color: var(--muted); }
+.result-track strong { display: block; color: var(--ink); }
+.result-best { font-weight: 800; }
+.results-subhead {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin: 42px 0 13px;
+}
+.results-subhead h3 { font-family: var(--serif); font-size: 25px; font-weight: 600; }
+.results-subhead p { margin-top: 4px; color: var(--muted); font-size: 12px; }
+.results-note { max-width: 900px; margin-top: 13px; color: var(--muted); font-size: 11px; }
 .explorer-section { color: #f4f6f8; background: #101317; }
 .explorer-section .eyebrow { color: #67cdce; }
 .explorer-heading { display: flex; align-items: end; justify-content: space-between; gap: 30px; }
@@ -482,6 +521,8 @@ footer { padding: 25px 0; color: #a7b0ba; background: #101317; }
   .overview-layout { gap: 28px; }
   .taxonomy-grid { grid-template-columns: 1fr; }
   .taxonomy-item { min-height: auto; }
+  .results-toolbar { align-items: stretch; flex-direction: column; }
+  .results-toolbar .button { width: fit-content; }
   .explorer-heading, .catalog-heading { align-items: start; flex-direction: column; }
   .preview-count { padding: 0; border: 0; }
   .media-grid { grid-template-columns: 1fr; }

@@ -1,0 +1,171 @@
+{
+  "protocol": {
+    "aggregation": "Per-frame metrics are averaged per video, then macro-averaged across videos.",
+    "psnrPolicy": "Finite means exclude zero-MSE videos and report their count separately.",
+    "maskSource": "Dataset ground-truth masks reconstructed from NPZ."
+  },
+  "methods": [
+    {
+      "id": "ours",
+      "label": "Ours",
+      "configuration": "40K checkpoint · GT mask · 6 steps",
+      "coverage": 1631,
+      "tracks": {
+        "main": {
+          "label": "Main test",
+          "samples": 1563,
+          "psnr": 37.698143757331735,
+          "psnr_finite_samples": 1556,
+          "psnr_infinite_samples": 7,
+          "ssim": 0.9662627071591903,
+          "lpips": 0.026287291974877617,
+          "twe_pred": 9.325971760022586,
+          "twe_gt": 9.383573989464317,
+          "mask_psnr": 31.204427342647424,
+          "mask_psnr_finite_samples": 1550,
+          "mask_psnr_infinite_samples": 13,
+          "mask_mae": 5.545245740098984,
+          "mask_crop_ssim": 0.9043790976803332
+        },
+        "seen": {
+          "label": "ASR seen regression",
+          "samples": 68,
+          "psnr": 40.25569083065793,
+          "psnr_finite_samples": 68,
+          "psnr_infinite_samples": 0,
+          "ssim": 0.9700668846993513,
+          "lpips": 0.023899268528570296,
+          "twe_pred": 3.0626678466796875,
+          "twe_gt": 3.0819989293813705,
+          "mask_psnr": 34.612345631616506,
+          "mask_psnr_finite_samples": 68,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 3.237425941509585,
+          "mask_crop_ssim": 0.9256580533494522
+        }
+      },
+      "byType": {
+        "standard_subtitle": {
+          "samples": 232,
+          "psnr": 37.99045679836984,
+          "psnr_finite_samples": 232,
+          "psnr_infinite_samples": 0,
+          "ssim": 0.967931088934615,
+          "lpips": 0.025196851385384588,
+          "twe_pred": 9.701287466133463,
+          "twe_gt": 9.767528163975683,
+          "mask_psnr": 31.094151668594183,
+          "mask_psnr_finite_samples": 231,
+          "mask_psnr_infinite_samples": 1,
+          "mask_mae": 4.933514908770617,
+          "mask_crop_ssim": 0.8916726183392046
+        },
+        "artistic_title": {
+          "samples": 218,
+          "psnr": 34.38466279824919,
+          "psnr_finite_samples": 216,
+          "psnr_infinite_samples": 2,
+          "ssim": 0.9475959371053846,
+          "lpips": 0.04009352131935464,
+          "twe_pred": 9.727813876550131,
+          "twe_gt": 9.800865110659272,
+          "mask_psnr": 26.870181558360766,
+          "mask_psnr_finite_samples": 218,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 8.981396696299672,
+          "mask_crop_ssim": 0.8580976453440577
+        },
+        "moving_text": {
+          "samples": 232,
+          "psnr": 38.64769140815712,
+          "psnr_finite_samples": 230,
+          "psnr_infinite_samples": 2,
+          "ssim": 0.9712470449732283,
+          "lpips": 0.02242899157994328,
+          "twe_pred": 8.845083019856748,
+          "twe_gt": 8.886274177966447,
+          "mask_psnr": 31.205822413579302,
+          "mask_psnr_finite_samples": 229,
+          "mask_psnr_infinite_samples": 3,
+          "mask_mae": 5.115762174922798,
+          "mask_crop_ssim": 0.8914072551585188
+        },
+        "vertical_text": {
+          "samples": 215,
+          "psnr": 38.14057740433535,
+          "psnr_finite_samples": 213,
+          "psnr_infinite_samples": 2,
+          "ssim": 0.9715299620800598,
+          "lpips": 0.022455008854737574,
+          "twe_pred": 9.999449486580007,
+          "twe_gt": 10.064799588086993,
+          "mask_psnr": 31.178609389150793,
+          "mask_psnr_finite_samples": 212,
+          "mask_psnr_infinite_samples": 3,
+          "mask_mae": 7.08549780698508,
+          "mask_crop_ssim": 0.8935430340348194
+        },
+        "non_bottom_layout": {
+          "samples": 223,
+          "psnr": 38.11097154787291,
+          "psnr_finite_samples": 223,
+          "psnr_infinite_samples": 0,
+          "ssim": 0.9682414800908618,
+          "lpips": 0.02490694374627477,
+          "twe_pred": 8.751550649313648,
+          "twe_gt": 8.81313792819934,
+          "mask_psnr": 31.510048901421804,
+          "mask_psnr_finite_samples": 222,
+          "mask_psnr_infinite_samples": 1,
+          "mask_mae": 4.725949584414883,
+          "mask_crop_ssim": 0.9014935921982747
+        },
+        "multi_region": {
+          "samples": 225,
+          "psnr": 36.492785087759806,
+          "psnr_finite_samples": 224,
+          "psnr_infinite_samples": 1,
+          "ssim": 0.9609950729986807,
+          "lpips": 0.03017261380465212,
+          "twe_pred": 9.29539464155833,
+          "twe_gt": 9.337856040530735,
+          "mask_psnr": 30.55994194532888,
+          "mask_psnr_finite_samples": 223,
+          "mask_psnr_infinite_samples": 2,
+          "mask_mae": 4.816323405532599,
+          "mask_crop_ssim": 0.9470376553665116
+        },
+        "persistent_watermark": {
+          "samples": 218,
+          "psnr": 40.052275316198,
+          "psnr_finite_samples": 218,
+          "psnr_infinite_samples": 0,
+          "ssim": 0.9760673697341405,
+          "lpips": 0.01892908566937511,
+          "twe_pred": 8.991427772088882,
+          "twe_gt": 9.045762062072754,
+          "mask_psnr": 36.09449922233519,
+          "mask_psnr_finite_samples": 215,
+          "mask_psnr_infinite_samples": 3,
+          "mask_mae": 3.2885356719880106,
+          "mask_crop_ssim": 0.9475982408381529
+        },
+        "asr_subtitle": {
+          "samples": 68,
+          "psnr": 40.25569083065793,
+          "psnr_finite_samples": 68,
+          "psnr_infinite_samples": 0,
+          "ssim": 0.9700668846993513,
+          "lpips": 0.023899268528570296,
+          "twe_pred": 3.0626678466796875,
+          "twe_gt": 3.0819989293813705,
+          "mask_psnr": 34.612345631616506,
+          "mask_psnr_finite_samples": 68,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 3.237425941509585,
+          "mask_crop_ssim": 0.9256580533494522
+        }
+      }
+    }
+  ]
+}
