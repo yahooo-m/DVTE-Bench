@@ -138,34 +138,36 @@
       <div class="shell">
         <div class="section-heading reveal">
           <p class="eyebrow">Benchmark Results</p>
-          <h2 id="results-title">Method-level evaluation</h2>
-          <p>Main-test results are reported separately from the ASR seen-regression track.</p>
+          <h2 id="results-title">Mask-region leaderboard</h2>
+          <p>Completed methods evaluated on the same stratified comparison subset.</p>
         </div>
         <div class="results-toolbar reveal">
           <div class="method-identity">
-            <span class="method-badge">Ours</span>
+            <span class="method-badge">5 methods</span>
             <div>
-              <strong>Complete evaluation</strong>
-              <span data-result-configuration>40K checkpoint · GT mask · 6 steps</span>
+              <strong>Complete comparison</strong>
+              <span data-result-configuration>800 videos · mask-region metrics</span>
             </div>
           </div>
-          <a class="button button-secondary" href="data/results.csv" download>
-            <i data-lucide="download" aria-hidden="true"></i> Results CSV
-          </a>
+          <div class="results-actions">
+            <label class="result-select">
+              <span>Track</span>
+              <select data-results-track aria-label="Result track"></select>
+            </label>
+            <a class="button button-secondary" href="data/results.csv" download>
+              <i data-lucide="download" aria-hidden="true"></i> Results CSV
+            </a>
+          </div>
         </div>
         <div class="table-wrap results-table overall-results reveal">
           <table>
             <thead>
               <tr>
                 <th>Method</th>
-                <th>Track</th>
                 <th>Videos</th>
-                <th>PSNR† ↑</th>
-                <th>SSIM ↑</th>
-                <th>LPIPS ↓</th>
-                <th>TWE Pred / GT</th>
                 <th>Mask PSNR† ↑</th>
                 <th>Mask MAE ↓</th>
+                <th>Mask MSE ↓</th>
                 <th>Mask Crop-SSIM ↑</th>
               </tr>
             </thead>
@@ -175,20 +177,22 @@
         <div class="results-subhead reveal">
           <div>
             <h3>Breakdown by text type</h3>
-            <p>Ours, evaluated on every sample in each benchmark slice.</p>
+            <p>All completed methods on the selected benchmark slice.</p>
           </div>
+          <label class="result-select">
+            <span>Text type</span>
+            <select data-results-type aria-label="Result text type"></select>
+          </label>
         </div>
         <div class="table-wrap results-table reveal">
           <table>
             <thead>
               <tr>
-                <th>Type</th>
+                <th>Method</th>
                 <th>Videos</th>
-                <th>PSNR† ↑</th>
-                <th>SSIM ↑</th>
-                <th>LPIPS ↓</th>
                 <th>Mask PSNR† ↑</th>
                 <th>Mask MAE ↓</th>
+                <th>Mask MSE ↓</th>
                 <th>Mask Crop-SSIM ↑</th>
               </tr>
             </thead>
@@ -196,8 +200,8 @@
           </table>
         </div>
         <p class="results-note reveal">
-          † Finite mean. Zero-MSE videos produce infinite PSNR and are excluded only from
-          finite-mean PSNR columns. Metrics use video-level macro averaging and dataset GT masks.
+          † Finite mean. Zero-MSE videos produce infinite Mask PSNR and are excluded only
+          from that finite-mean column. All displayed values are measured inside dataset GT masks.
         </p>
       </div>
     </section>

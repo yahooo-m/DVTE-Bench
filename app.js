@@ -19,6 +19,8 @@
   let benchmark;
   let activeCase;
   let previewFilter = "all";
+  let resultTrack = "main";
+  let resultType = "standard_subtitle";
   let catalogPage = 1;
   let filteredCatalog = [];
   let scrubbing = false;
@@ -119,46 +121,78 @@
   };
 
   const formatMetric = (value, digits) => Number(value).toFixed(digits);
-  const formatPsnr = (metrics, field) => {
-    const infinite = metrics[`${field}_infinite_samples`];
+  const formatMaskPsnr = (metrics) => {
+    const infinite = metrics.mask_psnr_infinite_samples;
     const suffix = infinite ? "†" : "";
-    return `<span title="${infinite} infinite-PSNR video${infinite === 1 ? "" : "s"}">${formatMetric(metrics[field], 2)}${suffix}</span>`;
+    return `<span title="${infinite} infinite Mask-PSNR video${infinite === 1 ? "" : "s"}">${formatMetric(metrics.mask_psnr, 2)}${suffix}</span>`;
   };
-  const metricCells = (metrics, includeTWE = true) => `
-    <td class="result-best">${formatPsnr(metrics, "psnr")}</td>
-    <td>${formatMetric(metrics.ssim, 4)}</td>
-    <td>${formatMetric(metrics.lpips, 4)}</td>
-    ${includeTWE ? `<td>${formatMetric(metrics.twe_pred, 2)} / ${formatMetric(metrics.twe_gt, 2)}</td>` : ""}
-    <td class="result-best">${formatPsnr(metrics, "mask_psnr")}</td>
-    <td>${formatMetric(metrics.mask_mae, 2)}</td>
-    <td>${formatMetric(metrics.mask_crop_ssim, 4)}</td>
+  const bestValue = (records, field, direction) => (
+    Math[direction](...records.map((record) => record.metrics[field]))
+  );
+  const metricCells = (metrics, best) => `
+    <td class="${metrics.mask_psnr === best.mask_psnr ? "result-best" : ""}">${formatMaskPsnr(metrics)}</td>
+    <td class="${metrics.mask_mae === best.mask_mae ? "result-best" : ""}">${formatMetric(metrics.mask_mae, 2)}</td>
+    <td class="${metrics.mask_mse === best.mask_mse ? "result-best" : ""}">${formatMetric(metrics.mask_mse, 2)}</td>
+    <td class="${metrics.mask_crop_ssim === best.mask_crop_ssim ? "result-best" : ""}">${formatMetric(metrics.mask_crop_ssim, 4)}</td>
   `;
+  const renderResultTable = (target, records) => {
+    const best = {
+      mask_psnr: bestValue(records, "mask_psnr", "max"),
+      mask_mae: bestValue(records, "mask_mae", "min"),
+      mask_mse: bestValue(records, "mask_mse", "min"),
+      mask_crop_ssim: bestValue(records, "mask_crop_ssim", "max"),
+    };
+    target.innerHTML = records
+      .map(({ method, metrics }) => {
+        return `
+          <tr class="${method.id === "ours" ? "is-ours" : ""}">
+            <td class="${method.id === "ours" ? "result-method" : ""}">${method.label}</td>
+            <td>${formatNumber(metrics.samples)}</td>
+            ${metricCells(metrics, best)}
+          </tr>
+        `;
+      }).join("");
+  };
+  const updateResultTables = () => {
+    const methods = benchmark.results.methods;
+    const trackRecords = methods.map((method) => ({
+      method,
+      metrics: method.tracks[resultTrack],
+    }));
+    const typeRecords = methods.map((method) => ({
+      method,
+      metrics: method.byType[resultType],
+    }));
+    renderResultTable(document.querySelector("[data-results-overall]"), trackRecords);
+    renderResultTable(document.querySelector("[data-results-by-type]"), typeRecords);
+    const track = methods[0].tracks[resultTrack];
+    document.querySelector("[data-result-configuration]").textContent =
+      `${methods.length} completed methods · ${formatNumber(track.samples)} videos · GT mask region`;
+  };
   const renderResults = () => {
-    const method = benchmark.results.methods[0];
-    document.querySelector("[data-result-configuration]").textContent = method.configuration;
-    document.querySelector("[data-results-overall]").innerHTML = ["main", "seen"]
-      .map((trackId) => {
-        const metrics = method.tracks[trackId];
-        return `
-          <tr>
-            <td class="result-method">${method.label}</td>
-            <td class="result-track"><strong>${metrics.label}</strong>${trackId === "seen" ? "Seen" : "Unseen"}</td>
-            <td>${formatNumber(metrics.samples)}</td>
-            ${metricCells(metrics)}
-          </tr>
-        `;
-      }).join("");
-    document.querySelector("[data-results-by-type]").innerHTML = benchmark.categories
-      .map((category) => {
-        const metrics = method.byType[category.id];
-        return `
-          <tr>
-            <td><strong>${category.label}</strong>${category.id === "asr_subtitle" ? " · seen" : ""}</td>
-            <td>${formatNumber(metrics.samples)}</td>
-            ${metricCells(metrics, false)}
-          </tr>
-        `;
-      }).join("");
+    const methods = benchmark.results.methods;
+    const trackSelect = document.querySelector("[data-results-track]");
+    const typeSelect = document.querySelector("[data-results-type]");
+    trackSelect.innerHTML = ["main", "seen"].map((trackId) => {
+      const track = methods[0].tracks[trackId];
+      return `<option value="${trackId}">${track.label} · ${track.samples}</option>`;
+    }).join("");
+    typeSelect.innerHTML = benchmark.categories.map((category) => {
+      const count = methods[0].byType[category.id].samples;
+      const suffix = category.id === "asr_subtitle" ? " · seen" : "";
+      return `<option value="${category.id}">${category.label}${suffix} · ${count}</option>`;
+    }).join("");
+    trackSelect.value = resultTrack;
+    typeSelect.value = resultType;
+    trackSelect.addEventListener("change", () => {
+      resultTrack = trackSelect.value;
+      updateResultTables();
+    });
+    typeSelect.addEventListener("change", () => {
+      resultType = typeSelect.value;
+      updateResultTables();
+    });
+    updateResultTables();
   };
 
   const renderComposition = () => {

@@ -1,169 +1,481 @@
 {
   "protocol": {
-    "aggregation": "Per-frame metrics are averaged per video, then macro-averaged across videos.",
+    "samples": 800,
+    "mainSamples": 767,
+    "seenSamples": 33,
+    "selection": "Proportional stratified sample from all eight DVTE-Bench types; seen ASR is reported separately.",
+    "aggregation": "Per-frame mask metrics are averaged per video, then macro-averaged across the same videos.",
+    "metricScope": "Dataset ground-truth mask region only.",
     "psnrPolicy": "Finite means exclude zero-MSE videos and report their count separately.",
-    "maskSource": "Dataset ground-truth masks reconstructed from NPZ."
+    "selectedCounts": {
+      "artistic_title": 107,
+      "asr_subtitle": 33,
+      "moving_text": 114,
+      "multi_region": 110,
+      "non_bottom_layout": 109,
+      "persistent_watermark": 107,
+      "standard_subtitle": 114,
+      "vertical_text": 106
+    }
   },
   "methods": [
     {
       "id": "ours",
       "label": "Ours",
       "configuration": "40K checkpoint · GT mask · 6 steps",
-      "coverage": 1631,
+      "coverage": 800,
       "tracks": {
         "main": {
-          "label": "Main test",
-          "samples": 1563,
-          "psnr": 37.698143757331735,
-          "psnr_finite_samples": 1556,
-          "psnr_infinite_samples": 7,
-          "ssim": 0.9662627071591903,
-          "lpips": 0.026287291974877617,
-          "twe_pred": 9.325971760022586,
-          "twe_gt": 9.383573989464317,
-          "mask_psnr": 31.204427342647424,
-          "mask_psnr_finite_samples": 1550,
-          "mask_psnr_infinite_samples": 13,
-          "mask_mae": 5.545245740098984,
-          "mask_crop_ssim": 0.9043790976803332
+          "label": "Main comparison",
+          "samples": 767,
+          "mask_psnr": 31.08042665425897,
+          "mask_psnr_infinite_samples": 4,
+          "mask_mae": 5.618601580987331,
+          "mask_mse": 137.68109401417308,
+          "mask_crop_ssim": 0.9042211533027178
         },
         "seen": {
           "label": "ASR seen regression",
-          "samples": 68,
-          "psnr": 40.25569083065793,
-          "psnr_finite_samples": 68,
-          "psnr_infinite_samples": 0,
-          "ssim": 0.9700668846993513,
-          "lpips": 0.023899268528570296,
-          "twe_pred": 3.0626678466796875,
-          "twe_gt": 3.0819989293813705,
-          "mask_psnr": 34.612345631616506,
-          "mask_psnr_finite_samples": 68,
+          "samples": 33,
+          "mask_psnr": 33.907361111232085,
           "mask_psnr_infinite_samples": 0,
-          "mask_mae": 3.237425941509585,
-          "mask_crop_ssim": 0.9256580533494522
+          "mask_mae": 3.48558292533613,
+          "mask_mse": 41.19145489656357,
+          "mask_crop_ssim": 0.9179967761282765
         }
       },
       "byType": {
         "standard_subtitle": {
-          "samples": 232,
-          "psnr": 37.99045679836984,
-          "psnr_finite_samples": 232,
-          "psnr_infinite_samples": 0,
-          "ssim": 0.967931088934615,
-          "lpips": 0.025196851385384588,
-          "twe_pred": 9.701287466133463,
-          "twe_gt": 9.767528163975683,
-          "mask_psnr": 31.094151668594183,
-          "mask_psnr_finite_samples": 231,
-          "mask_psnr_infinite_samples": 1,
-          "mask_mae": 4.933514908770617,
-          "mask_crop_ssim": 0.8916726183392046
+          "samples": 114,
+          "mask_psnr": 31.14881263182905,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 4.942596972768472,
+          "mask_mse": 95.70443650563462,
+          "mask_crop_ssim": 0.8899974134186079
         },
         "artistic_title": {
-          "samples": 218,
-          "psnr": 34.38466279824919,
-          "psnr_finite_samples": 216,
-          "psnr_infinite_samples": 2,
-          "ssim": 0.9475959371053846,
-          "lpips": 0.04009352131935464,
-          "twe_pred": 9.727813876550131,
-          "twe_gt": 9.800865110659272,
-          "mask_psnr": 26.870181558360766,
-          "mask_psnr_finite_samples": 218,
+          "samples": 107,
+          "mask_psnr": 26.524709031635716,
           "mask_psnr_infinite_samples": 0,
-          "mask_mae": 8.981396696299672,
-          "mask_crop_ssim": 0.8580976453440577
+          "mask_mae": 9.217919203799953,
+          "mask_mse": 315.7778540097368,
+          "mask_crop_ssim": 0.8589557962691814
         },
         "moving_text": {
-          "samples": 232,
-          "psnr": 38.64769140815712,
-          "psnr_finite_samples": 230,
-          "psnr_infinite_samples": 2,
-          "ssim": 0.9712470449732283,
-          "lpips": 0.02242899157994328,
-          "twe_pred": 8.845083019856748,
-          "twe_gt": 8.886274177966447,
-          "mask_psnr": 31.205822413579302,
-          "mask_psnr_finite_samples": 229,
-          "mask_psnr_infinite_samples": 3,
-          "mask_mae": 5.115762174922798,
-          "mask_crop_ssim": 0.8914072551585188
+          "samples": 114,
+          "mask_psnr": 30.88543514539063,
+          "mask_psnr_infinite_samples": 1,
+          "mask_mae": 5.19515632683449,
+          "mask_mse": 101.72423131649985,
+          "mask_crop_ssim": 0.8909476858698582
         },
         "vertical_text": {
-          "samples": 215,
-          "psnr": 38.14057740433535,
-          "psnr_finite_samples": 213,
-          "psnr_infinite_samples": 2,
-          "ssim": 0.9715299620800598,
-          "lpips": 0.022455008854737574,
-          "twe_pred": 9.999449486580007,
-          "twe_gt": 10.064799588086993,
-          "mask_psnr": 31.178609389150793,
-          "mask_psnr_finite_samples": 212,
-          "mask_psnr_infinite_samples": 3,
-          "mask_mae": 7.08549780698508,
-          "mask_crop_ssim": 0.8935430340348194
+          "samples": 106,
+          "mask_psnr": 31.251627932105826,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 7.219488131156075,
+          "mask_mse": 241.62989229194633,
+          "mask_crop_ssim": 0.8916259881999913
         },
         "non_bottom_layout": {
-          "samples": 223,
-          "psnr": 38.11097154787291,
-          "psnr_finite_samples": 223,
-          "psnr_infinite_samples": 0,
-          "ssim": 0.9682414800908618,
-          "lpips": 0.02490694374627477,
-          "twe_pred": 8.751550649313648,
-          "twe_gt": 8.81313792819934,
-          "mask_psnr": 31.510048901421804,
-          "mask_psnr_finite_samples": 222,
-          "mask_psnr_infinite_samples": 1,
-          "mask_mae": 4.725949584414883,
-          "mask_crop_ssim": 0.9014935921982747
+          "samples": 109,
+          "mask_psnr": 31.420969568866933,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 4.793411034404028,
+          "mask_mse": 88.66577662859228,
+          "mask_crop_ssim": 0.9002121441962931
         },
         "multi_region": {
-          "samples": 225,
-          "psnr": 36.492785087759806,
-          "psnr_finite_samples": 224,
-          "psnr_infinite_samples": 1,
-          "ssim": 0.9609950729986807,
-          "lpips": 0.03017261380465212,
-          "twe_pred": 9.29539464155833,
-          "twe_gt": 9.337856040530735,
-          "mask_psnr": 30.55994194532888,
-          "mask_psnr_finite_samples": 223,
-          "mask_psnr_infinite_samples": 2,
-          "mask_mae": 4.816323405532599,
-          "mask_crop_ssim": 0.9470376553665116
+          "samples": 110,
+          "mask_psnr": 30.656940711174986,
+          "mask_psnr_infinite_samples": 1,
+          "mask_mae": 4.760495700394004,
+          "mask_mse": 84.72814220425025,
+          "mask_crop_ssim": 0.9482149456290032
         },
         "persistent_watermark": {
-          "samples": 218,
-          "psnr": 40.052275316198,
-          "psnr_finite_samples": 218,
-          "psnr_infinite_samples": 0,
-          "ssim": 0.9760673697341405,
-          "lpips": 0.01892908566937511,
-          "twe_pred": 8.991427772088882,
-          "twe_gt": 9.045762062072754,
-          "mask_psnr": 36.09449922233519,
-          "mask_psnr_finite_samples": 215,
-          "mask_psnr_infinite_samples": 3,
-          "mask_mae": 3.2885356719880106,
-          "mask_crop_ssim": 0.9475982408381529
+          "samples": 107,
+          "mask_psnr": 35.77179121932516,
+          "mask_psnr_infinite_samples": 2,
+          "mask_mae": 3.3275150463554124,
+          "mask_mse": 44.00810018855248,
+          "mask_crop_ssim": 0.9501167343711275
         },
         "asr_subtitle": {
-          "samples": 68,
-          "psnr": 40.25569083065793,
-          "psnr_finite_samples": 68,
-          "psnr_infinite_samples": 0,
-          "ssim": 0.9700668846993513,
-          "lpips": 0.023899268528570296,
-          "twe_pred": 3.0626678466796875,
-          "twe_gt": 3.0819989293813705,
-          "mask_psnr": 34.612345631616506,
-          "mask_psnr_finite_samples": 68,
+          "samples": 33,
+          "mask_psnr": 33.907361111232085,
           "mask_psnr_infinite_samples": 0,
-          "mask_mae": 3.237425941509585,
-          "mask_crop_ssim": 0.9256580533494522
+          "mask_mae": 3.48558292533613,
+          "mask_mse": 41.19145489656357,
+          "mask_crop_ssim": 0.9179967761282765
+        }
+      }
+    },
+    {
+      "id": "clear",
+      "label": "CLEAR",
+      "configuration": "Completed baseline",
+      "coverage": 800,
+      "tracks": {
+        "main": {
+          "label": "Main comparison",
+          "samples": 767,
+          "mask_psnr": 16.572324505805422,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 34.52345921552303,
+          "mask_mse": 3026.683420568004,
+          "mask_crop_ssim": 0.609241069603296
+        },
+        "seen": {
+          "label": "ASR seen regression",
+          "samples": 33,
+          "mask_psnr": 20.496455271401942,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 22.36606643086883,
+          "mask_mse": 970.5709828444072,
+          "mask_crop_ssim": 0.7742288333423404
+        }
+      },
+      "byType": {
+        "standard_subtitle": {
+          "samples": 114,
+          "mask_psnr": 18.634385916563392,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 27.00975128158129,
+          "mask_mse": 1752.4757297178276,
+          "mask_crop_ssim": 0.633550876352405
+        },
+        "artistic_title": {
+          "samples": 107,
+          "mask_psnr": 9.993448764270843,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 58.10261657899039,
+          "mask_mse": 7406.921191417873,
+          "mask_crop_ssim": 0.43303241607432313
+        },
+        "moving_text": {
+          "samples": 114,
+          "mask_psnr": 16.58721258113801,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 34.36001632397521,
+          "mask_mse": 2969.2681823305084,
+          "mask_crop_ssim": 0.5800549040641658
+        },
+        "vertical_text": {
+          "samples": 106,
+          "mask_psnr": 15.249218374883824,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 39.21934013374094,
+          "mask_mse": 3761.15272955649,
+          "mask_crop_ssim": 0.5113793310980599
+        },
+        "non_bottom_layout": {
+          "samples": 109,
+          "mask_psnr": 17.83135283010051,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 30.173282255910078,
+          "mask_mse": 2189.7463463887175,
+          "mask_crop_ssim": 0.6320435373482703
+        },
+        "multi_region": {
+          "samples": 110,
+          "mask_psnr": 16.955110718661334,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 29.930795837844162,
+          "mask_mse": 2177.1063597243274,
+          "mask_crop_ssim": 0.7231373582090768
+        },
+        "persistent_watermark": {
+          "samples": 107,
+          "mask_psnr": 20.573036113705015,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 23.624620327917068,
+          "mask_mse": 1063.5567239383054,
+          "mask_crop_ssim": 0.7472739142797359
+        },
+        "asr_subtitle": {
+          "samples": 33,
+          "mask_psnr": 20.496455271401942,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 22.36606643086883,
+          "mask_mse": 970.5709828444072,
+          "mask_crop_ssim": 0.7742288333423404
+        }
+      }
+    },
+    {
+      "id": "propainter",
+      "label": "ProPainter",
+      "configuration": "Completed baseline",
+      "coverage": 800,
+      "tracks": {
+        "main": {
+          "label": "Main comparison",
+          "samples": 767,
+          "mask_psnr": 25.755698734959267,
+          "mask_psnr_infinite_samples": 3,
+          "mask_mae": 11.683928636134613,
+          "mask_mse": 655.1005315835984,
+          "mask_crop_ssim": 0.8183501817798393
+        },
+        "seen": {
+          "label": "ASR seen regression",
+          "samples": 33,
+          "mask_psnr": 29.311263118968508,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 5.571266391869779,
+          "mask_mse": 131.79507107614796,
+          "mask_crop_ssim": 0.8693108522534986
+        }
+      },
+      "byType": {
+        "standard_subtitle": {
+          "samples": 114,
+          "mask_psnr": 25.32635290283755,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 11.31377525364578,
+          "mask_mse": 578.2522370573962,
+          "mask_crop_ssim": 0.7830404245781322
+        },
+        "artistic_title": {
+          "samples": 107,
+          "mask_psnr": 19.15526746036481,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 23.39659919374417,
+          "mask_mse": 1795.7268597774744,
+          "mask_crop_ssim": 0.6768534301394513
+        },
+        "moving_text": {
+          "samples": 114,
+          "mask_psnr": 27.143269576610635,
+          "mask_psnr_infinite_samples": 1,
+          "mask_mae": 8.623192746288014,
+          "mask_mse": 336.1785343937654,
+          "mask_crop_ssim": 0.817462456606355
+        },
+        "vertical_text": {
+          "samples": 106,
+          "mask_psnr": 27.516821573516655,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 9.494491402962089,
+          "mask_mse": 411.8455211879323,
+          "mask_crop_ssim": 0.8204780106537556
+        },
+        "non_bottom_layout": {
+          "samples": 109,
+          "mask_psnr": 24.8463133612932,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 12.464066860274967,
+          "mask_mse": 753.3036102112061,
+          "mask_crop_ssim": 0.7837235114965079
+        },
+        "multi_region": {
+          "samples": 110,
+          "mask_psnr": 23.73191380145025,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 11.149850280599608,
+          "mask_mse": 546.2659031854768,
+          "mask_crop_ssim": 0.9204389277021483
+        },
+        "persistent_watermark": {
+          "samples": 107,
+          "mask_psnr": 32.740997722248686,
+          "mask_psnr_infinite_samples": 2,
+          "mask_mae": 5.549905521890362,
+          "mask_mse": 188.96502498741128,
+          "mask_crop_ssim": 0.9266273833227149
+        },
+        "asr_subtitle": {
+          "samples": 33,
+          "mask_psnr": 29.311263118968508,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 5.571266391869779,
+          "mask_mse": 131.79507107614796,
+          "mask_crop_ssim": 0.8693108522534986
+        }
+      }
+    },
+    {
+      "id": "minimax-remover",
+      "label": "MiniMax-Remover",
+      "configuration": "Completed baseline",
+      "coverage": 800,
+      "tracks": {
+        "main": {
+          "label": "Main comparison",
+          "samples": 767,
+          "mask_psnr": 25.920863794915245,
+          "mask_psnr_infinite_samples": 2,
+          "mask_mae": 10.419861318332156,
+          "mask_mse": 458.8165605470766,
+          "mask_crop_ssim": 0.8358715477637694
+        },
+        "seen": {
+          "label": "ASR seen regression",
+          "samples": 33,
+          "mask_psnr": 30.682741031972018,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 4.826856694010885,
+          "mask_mse": 84.73211027583321,
+          "mask_crop_ssim": 0.9003655881717183
+        }
+      },
+      "byType": {
+        "standard_subtitle": {
+          "samples": 114,
+          "mask_psnr": 25.319254808803723,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 10.737914329611797,
+          "mask_mse": 478.309998213722,
+          "mask_crop_ssim": 0.7947771509700647
+        },
+        "artistic_title": {
+          "samples": 107,
+          "mask_psnr": 22.533631579855083,
+          "mask_psnr_infinite_samples": 1,
+          "mask_mae": 13.905018439391384,
+          "mask_mse": 765.6965650242629,
+          "mask_crop_ssim": 0.7566704281376997
+        },
+        "moving_text": {
+          "samples": 114,
+          "mask_psnr": 26.471092517265816,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 9.413875932659533,
+          "mask_mse": 362.9939100869507,
+          "mask_crop_ssim": 0.8174157002062412
+        },
+        "vertical_text": {
+          "samples": 106,
+          "mask_psnr": 27.828609790038033,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 9.246677154921136,
+          "mask_mse": 377.0567513556155,
+          "mask_crop_ssim": 0.839292788637625
+        },
+        "non_bottom_layout": {
+          "samples": 109,
+          "mask_psnr": 25.601955049812563,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 10.69050088381603,
+          "mask_mse": 465.1122543517584,
+          "mask_crop_ssim": 0.8120397141935626
+        },
+        "multi_region": {
+          "samples": 110,
+          "mask_psnr": 23.908986573847127,
+          "mask_psnr_infinite_samples": 1,
+          "mask_mae": 11.15221131092854,
+          "mask_mse": 496.63125715011313,
+          "mask_crop_ssim": 0.9224376319674468
+        },
+        "persistent_watermark": {
+          "samples": 107,
+          "mask_psnr": 29.81561668925831,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 7.801279899880585,
+          "mask_mse": 268.96667552509814,
+          "mask_crop_ssim": 0.9104135731857355
+        },
+        "asr_subtitle": {
+          "samples": 33,
+          "mask_psnr": 30.682741031972018,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 4.826856694010885,
+          "mask_mse": 84.73211027583321,
+          "mask_crop_ssim": 0.9003655881717183
+        }
+      }
+    },
+    {
+      "id": "diffueraser",
+      "label": "DiffuEraser",
+      "configuration": "Completed baseline",
+      "coverage": 800,
+      "tracks": {
+        "main": {
+          "label": "Main comparison",
+          "samples": 767,
+          "mask_psnr": 25.468629105548988,
+          "mask_psnr_infinite_samples": 3,
+          "mask_mae": 11.292303572949775,
+          "mask_mse": 555.9271055674392,
+          "mask_crop_ssim": 0.8178114798602012
+        },
+        "seen": {
+          "label": "ASR seen regression",
+          "samples": 33,
+          "mask_psnr": 28.24041695227831,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 6.3265249268778465,
+          "mask_mse": 135.845041842874,
+          "mask_crop_ssim": 0.8509459958055937
+        }
+      },
+      "byType": {
+        "standard_subtitle": {
+          "samples": 114,
+          "mask_psnr": 25.18823053175303,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 11.063215652572708,
+          "mask_mse": 559.3731795463484,
+          "mask_crop_ssim": 0.7788230266626477
+        },
+        "artistic_title": {
+          "samples": 107,
+          "mask_psnr": 20.4693911083772,
+          "mask_psnr_infinite_samples": 1,
+          "mask_mae": 18.451070254509997,
+          "mask_mse": 1153.5268009411648,
+          "mask_crop_ssim": 0.7139219484212401
+        },
+        "moving_text": {
+          "samples": 114,
+          "mask_psnr": 26.297735484810907,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 9.798539286126498,
+          "mask_mse": 408.14361942095843,
+          "mask_crop_ssim": 0.8018595805057617
+        },
+        "vertical_text": {
+          "samples": 106,
+          "mask_psnr": 27.753245099755205,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 9.168190963038956,
+          "mask_mse": 370.12174602533463,
+          "mask_crop_ssim": 0.8241697298060306
+        },
+        "non_bottom_layout": {
+          "samples": 109,
+          "mask_psnr": 24.923428969086235,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 12.101398039220538,
+          "mask_mse": 640.4236788124266,
+          "mask_crop_ssim": 0.7853441161989695
+        },
+        "multi_region": {
+          "samples": 110,
+          "mask_psnr": 23.9781299563193,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 11.02239888544249,
+          "mask_mse": 501.23240332132866,
+          "mask_crop_ssim": 0.9194736257182717
+        },
+        "persistent_watermark": {
+          "samples": 107,
+          "mask_psnr": 29.740809712986355,
+          "mask_psnr_infinite_samples": 2,
+          "mask_mae": 7.526614527592102,
+          "mask_mse": 266.3285677818931,
+          "mask_crop_ssim": 0.9024985093492093
+        },
+        "asr_subtitle": {
+          "samples": 33,
+          "mask_psnr": 28.24041695227831,
+          "mask_psnr_infinite_samples": 0,
+          "mask_mae": 6.3265249268778465,
+          "mask_mse": 135.845041842874,
+          "mask_crop_ssim": 0.8509459958055937
         }
       }
     }
