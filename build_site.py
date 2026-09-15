@@ -17,16 +17,10 @@ from pathlib import Path
 SITE_DIR = Path(__file__).resolve().parent
 BENCHMARK_DIR = SITE_DIR.parent
 PROJECT_DIR = BENCHMARK_DIR.parent.parent
-COMPARISON_DIR = PROJECT_DIR / "Bnechmark_test" / "othermethods_compare_800"
+COMPARISON_DIR = PROJECT_DIR / "Bnechmark_test" / "othermethods_compare_1631"
 COMPARISON_SUMMARY_JSON = COMPARISON_DIR / "comparison_summary.json"
 COMPARISON_STATUS_JSON = COMPARISON_DIR / "pipeline_status.json"
 COMPARISON_MANIFEST_CSV = COMPARISON_DIR / "manifest.csv"
-OURS_METRICS_JSON = (
-    PROJECT_DIR
-    / "Bnechmark_test"
-    / "lingbot_40k_multitype_gtmask"
-    / "metrics_summary.json"
-)
 DATA_DIR = SITE_DIR / "data"
 POSTER_DIR = SITE_DIR / "assets" / "posters"
 VIDEO_DIR = SITE_DIR / "assets" / "videos"
@@ -142,19 +136,49 @@ PUBLIC_FIELDS = [
     "ocr_status",
 ]
 
-MASK_RESULT_FIELDS = (
+RESULT_FIELDS = (
+    "psnr",
+    "psnr_infinite_samples",
+    "ssim",
+    "lpips",
+    "twe_pred",
+    "twe_gt",
+    "twe_gap",
     "mask_psnr",
+    "mask_psnr_infinite_samples",
     "mask_mae",
     "mask_mse",
     "mask_crop_ssim",
+    "seconds_per_frame",
+    "throughput_fps",
 )
 
 METHODS = {
-    "LingBot-40K": ("ours", "Ours", None),
-    "CLEAR": ("clear", "CLEAR", "clear"),
-    "ProPainter": ("propainter", "ProPainter", "propainter"),
-    "MiniMax-Remover": ("minimax-remover", "MiniMax-Remover", "minimax_remover"),
-    "DiffuEraser": ("diffueraser", "DiffuEraser", "diffueraser"),
+    "LingBot-40K": {
+        "id": "ours",
+        "label": "LingBot-40K",
+        "configuration": "40K checkpoint · GT mask · 6 steps",
+    },
+    "CLEAR": {
+        "id": "clear",
+        "label": "CLEAR",
+        "configuration": "Official inference · mask-free",
+    },
+    "ProPainter": {
+        "id": "propainter",
+        "label": "ProPainter",
+        "configuration": "Official inference · GT mask paste-back",
+    },
+    "MiniMax-Remover": {
+        "id": "minimax-remover",
+        "label": "MiniMax-Remover",
+        "configuration": "Official inference · GT mask paste-back",
+    },
+    "DiffuEraser": {
+        "id": "diffueraser",
+        "label": "DiffuEraser",
+        "configuration": "Official inference · GT mask paste-back",
+    },
 }
 
 
@@ -304,22 +328,86 @@ def write_public_csv(rows: list[dict[str, str]]) -> None:
             writer.writerow({field: row[field] for field in PUBLIC_FIELDS})
 
 
-def aggregate_mask_metrics(rows: list[dict[str, object]]) -> dict[str, object]:
-    psnr_values = [float(row["mask_psnr"]) for row in rows]
-    finite_psnr = [value for value in psnr_values if math.isfinite(value)]
-    if not rows or not finite_psnr:
-        raise ValueError("Mask metric group has no finite records")
-    result: dict[str, object] = {
-        "samples": len(rows),
-        "mask_psnr": sum(finite_psnr) / len(finite_psnr),
-        "mask_psnr_infinite_samples": len(psnr_values) - len(finite_psnr),
+def finite_or_none(value: object) -> float | None:
+    if value is None:
+        return None
+    number = float(value)
+    return number if math.isfinite(number) else None
+
+
+def normalize_metrics(row: dict[str, object]) -> dict[str, object]:
+    twe_pred = finite_or_none(row["TWE_pred"])
+    twe_gt = finite_or_none(row["TWE_gt"])
+    if twe_pred is None or twe_gt is None:
+        raise ValueError("TWE means must be finite")
+    return {
+        "samples": int(row["Videos"]),
+        "psnr": finite_or_none(row["PSNR_finite_mean"]),
+        "psnr_infinite_samples": int(row["PSNR_infinite_videos"]),
+        "ssim": finite_or_none(row["SSIM"]),
+        "lpips": finite_or_none(row["LPIPS"]),
+        "twe_pred": twe_pred,
+        "twe_gt": twe_gt,
+        "twe_gap": abs(twe_pred - twe_gt),
+        "mask_psnr": finite_or_none(row["MaskRegion_PSNR_finite_mean"]),
+        "mask_psnr_infinite_samples": int(row["MaskRegion_PSNR_infinite_videos"]),
+        "mask_mae": finite_or_none(row["MaskRegion_MAE"]),
+        "mask_mse": finite_or_none(row["MaskRegion_MSE"]),
+        "mask_crop_ssim": finite_or_none(row["MaskRegionCrop_SSIM"]),
     }
-    for field in ("mask_mae", "mask_mse", "mask_crop_ssim"):
-        values = [float(row[field]) for row in rows]
-        if not all(math.isfinite(value) for value in values):
-            raise ValueError(f"Non-finite mask metric values for {field}")
-        result[field] = sum(values) / len(values)
-    return result
+
+
+def weighted_mean(rows: list[dict[str, object]], field: str) -> float:
+    weighted_sum = sum(float(row[field]) * int(row["Videos"]) for row in rows)
+    return weighted_sum / sum(int(row["Videos"]) for row in rows)
+
+
+def aggregate_type_metrics(rows: list[dict[str, object]]) -> dict[str, object]:
+    samples = sum(int(row["Videos"]) for row in rows)
+    psnr_finite_samples = sum(
+        int(row["Videos"]) - int(row["PSNR_infinite_videos"]) for row in rows
+    )
+    mask_psnr_finite_samples = sum(
+        int(row["Videos"]) - int(row["MaskRegion_PSNR_infinite_videos"])
+        for row in rows
+    )
+
+    def finite_psnr(field: str, count_field: str, count: int) -> float | None:
+        if count == 0:
+            return None
+        total = 0.0
+        for row in rows:
+            finite_count = int(row["Videos"]) - int(row[count_field])
+            value = finite_or_none(row[field])
+            if finite_count and value is None:
+                raise ValueError(f"Missing {field} with {finite_count} finite samples")
+            if value is not None:
+                total += value * finite_count
+        return total / count
+
+    twe_pred = weighted_mean(rows, "TWE_pred")
+    twe_gt = weighted_mean(rows, "TWE_gt")
+    return {
+        "samples": samples,
+        "psnr": finite_psnr(
+            "PSNR_finite_mean", "PSNR_infinite_videos", psnr_finite_samples
+        ),
+        "psnr_infinite_samples": samples - psnr_finite_samples,
+        "ssim": weighted_mean(rows, "SSIM"),
+        "lpips": weighted_mean(rows, "LPIPS"),
+        "twe_pred": twe_pred,
+        "twe_gt": twe_gt,
+        "twe_gap": abs(twe_pred - twe_gt),
+        "mask_psnr": finite_psnr(
+            "MaskRegion_PSNR_finite_mean",
+            "MaskRegion_PSNR_infinite_videos",
+            mask_psnr_finite_samples,
+        ),
+        "mask_psnr_infinite_samples": samples - mask_psnr_finite_samples,
+        "mask_mae": weighted_mean(rows, "MaskRegion_MAE"),
+        "mask_mse": weighted_mean(rows, "MaskRegion_MSE"),
+        "mask_crop_ssim": weighted_mean(rows, "MaskRegionCrop_SSIM"),
+    }
 
 
 def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
@@ -327,86 +415,83 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
         COMPARISON_SUMMARY_JSON,
         COMPARISON_STATUS_JSON,
         COMPARISON_MANIFEST_CSV,
-        OURS_METRICS_JSON,
     )
     if not all(path.is_file() for path in required):
         raise FileNotFoundError(f"Missing completed comparison metrics under {COMPARISON_DIR}")
-    status = json.loads(COMPARISON_STATUS_JSON.read_text(encoding="utf-8"))
-    if status.get("stage") != "complete" or int(status.get("samples", 0)) != 800:
-        raise ValueError(f"Comparison pipeline is not complete: {status}")
-    completed = {row["Method"] for row in status["summary"]}
-    if completed != set(METHODS):
-        raise ValueError(f"Unexpected completed methods: {sorted(completed)}")
 
-    with COMPARISON_MANIFEST_CSV.open(encoding="utf-8", newline="") as handle:
-        comparison_rows = list(csv.DictReader(handle))
-    expected_names = {row["name"] for row in comparison_rows}
-    types = {row["name"]: row["benchmark_type"] for row in comparison_rows}
-    selected_counts = dict(Counter(types.values()))
-    if set(selected_counts) != set(CATEGORY_ORDER) or sum(selected_counts.values()) != 800:
-        raise ValueError(f"Unexpected comparison subset composition: {selected_counts}")
+    status = json.loads(COMPARISON_STATUS_JSON.read_text(encoding="utf-8"))
+    if status.get("stage") != "complete" or int(status.get("samples", 0)) != 1631:
+        raise ValueError(f"Comparison pipeline is not complete: {status}")
     if len(dataset_rows) != 1631:
         raise ValueError(f"Unexpected DVTE-Bench size: {len(dataset_rows)}")
 
-    methods = []
-    for source_name, (method_id, label, baseline_slug) in METHODS.items():
-        if baseline_slug is None:
-            source = json.loads(OURS_METRICS_JSON.read_text(encoding="utf-8"))
-            records = [
-                row for row in source["per_video"]
-                if row["name"] in expected_names
-            ]
-        else:
-            source_path = COMPARISON_DIR / "results" / baseline_slug / "metrics_mask_region.json"
-            source = json.loads(source_path.read_text(encoding="utf-8"))
-            if source["missing"]:
-                raise ValueError(f"Incomplete mask metrics for {source_name}: {source['missing']}")
-            records = source["per_video"]
-        if {row["name"] for row in records} != expected_names:
-            raise ValueError(f"Mask metric coverage mismatch for {source_name}")
-        for row in records:
-            row["benchmark_type"] = types[row["name"]]
+    with COMPARISON_MANIFEST_CSV.open(encoding="utf-8", newline="") as handle:
+        comparison_rows = list(csv.DictReader(handle))
+    dataset_names = {row["name"] for row in dataset_rows}
+    comparison_names = {row["name"] for row in comparison_rows}
+    if len(comparison_rows) != 1631 or comparison_names != dataset_names:
+        raise ValueError("Full comparison manifest does not match DVTE-Bench")
 
-        main_records = [row for row in records if row["benchmark_type"] != "asr_subtitle"]
-        seen_records = [row for row in records if row["benchmark_type"] == "asr_subtitle"]
+    source = json.loads(COMPARISON_SUMMARY_JSON.read_text(encoding="utf-8"))
+    summary_by_method = {row["Method"]: row for row in source["summary"]}
+    by_type = source["by_type"]
+    if set(summary_by_method) != set(METHODS) or set(by_type) != set(METHODS):
+        raise ValueError("Comparison summary method coverage is incomplete")
+
+    selected_counts = dict(Counter(row["benchmark_type"] for row in dataset_rows))
+    expected_counts = {category: selected_counts[category] for category in CATEGORY_ORDER}
+    methods = []
+    for source_name, metadata in METHODS.items():
+        type_rows = by_type[source_name]
+        if set(type_rows) != set(CATEGORY_ORDER):
+            raise ValueError(f"Type coverage is incomplete for {source_name}")
+        for category, expected_count in expected_counts.items():
+            if int(type_rows[category]["Videos"]) != expected_count:
+                raise ValueError(f"Unexpected {category} coverage for {source_name}")
+
+        all_metrics = normalize_metrics(summary_by_method[source_name])
+        main_metrics = aggregate_type_metrics(
+            [type_rows[category] for category in CATEGORY_ORDER if category != "asr_subtitle"]
+        )
+        seen_metrics = normalize_metrics(type_rows["asr_subtitle"])
         methods.append(
             {
-                "id": method_id,
-                "label": label,
-                "configuration": (
-                    "40K checkpoint · GT mask · 6 steps"
-                    if method_id == "ours"
-                    else "Completed baseline"
-                ),
-                "coverage": 800,
+                **metadata,
+                "coverage": 1631,
                 "tracks": {
-                    "main": {
-                        "label": "Main comparison",
-                        **aggregate_mask_metrics(main_records),
-                    },
-                    "seen": {
-                        "label": "ASR seen regression",
-                        **aggregate_mask_metrics(seen_records),
-                    },
+                    "all": {"label": "Full benchmark", **all_metrics},
+                    "main": {"label": "Main synthetic", **main_metrics},
+                    "seen": {"label": "ASR seen regression", **seen_metrics},
                 },
                 "byType": {
-                    category: aggregate_mask_metrics(
-                        [row for row in records if row["benchmark_type"] == category]
-                    )
+                    category: normalize_metrics(type_rows[category])
                     for category in CATEGORY_ORDER
+                },
+                "speed": {
+                    "samples": int(summary_by_method[source_name]["Speed_videos"]),
+                    "seconds_per_frame": finite_or_none(
+                        summary_by_method[source_name]["Seconds_per_frame"]
+                    ),
+                    "throughput_fps": finite_or_none(
+                        summary_by_method[source_name]["Throughput_FPS"]
+                    ),
                 },
             }
         )
+
+    source_protocol = source["protocol"]
     return {
         "protocol": {
-            "samples": 800,
-            "mainSamples": 767,
-            "seenSamples": 33,
-            "selection": "Proportional stratified sample from all eight DVTE-Bench types; seen ASR is reported separately.",
-            "aggregation": "Per-frame mask metrics are averaged per video, then macro-averaged across the same videos.",
-            "metricScope": "Dataset ground-truth mask region only.",
-            "psnrPolicy": "Finite means exclude zero-MSE videos and report their count separately.",
-            "selectedCounts": selected_counts,
+            "samples": 1631,
+            "mainSamples": 1563,
+            "seenSamples": 68,
+            "selection": "Complete evaluation on all DVTE-Bench videos; seen ASR is reported separately.",
+            "aggregation": source_protocol["aggregation"],
+            "metricScope": "Whole frame and dataset ground-truth mask region.",
+            "psnrPolicy": source_protocol["psnr_infinity"],
+            "speedPolicy": source_protocol["speed"],
+            "baselinePostprocess": source_protocol["baseline_postprocess"],
+            "selectedCounts": expected_counts,
         },
         "methods": methods,
     }
@@ -417,13 +502,13 @@ def write_results_csv(results: dict[str, object]) -> None:
         "method",
         "scope",
         "samples",
-        *MASK_RESULT_FIELDS,
-        "mask_psnr_infinite_samples",
+        *RESULT_FIELDS,
     ]
     rows: list[dict[str, object]] = []
     for method in results["methods"]:
         for track, metrics in method["tracks"].items():
-            rows.append({"method": method["label"], "scope": track, **metrics})
+            speed = method["speed"] if track == "all" else {}
+            rows.append({"method": method["label"], "scope": track, **metrics, **speed})
         for category, metrics in method["byType"].items():
             rows.append({"method": method["label"], "scope": category, **metrics})
     with (DATA_DIR / "results.csv").open("w", encoding="utf-8", newline="") as handle:
@@ -574,12 +659,12 @@ def build(force: bool, workers: int) -> None:
         },
     }
     (DATA_DIR / "benchmark.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, separators=(",", ":")),
+        json.dumps(manifest, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
         encoding="utf-8",
     )
     write_public_csv(rows)
     (DATA_DIR / "results.json").write_text(
-        json.dumps(results, ensure_ascii=False, indent=2),
+        json.dumps(results, ensure_ascii=False, indent=2, allow_nan=False),
         encoding="utf-8",
     )
     write_results_csv(results)

@@ -138,18 +138,22 @@
       <div class="shell">
         <div class="section-heading reveal">
           <p class="eyebrow">Benchmark Results</p>
-          <h2 id="results-title">Mask-region leaderboard</h2>
-          <p>Completed methods evaluated on the same stratified comparison subset.</p>
+          <h2 id="results-title">Full-benchmark leaderboard</h2>
+          <p>Five methods evaluated on all 1,631 clips with whole-frame, mask-region, temporal, perceptual, and runtime metrics.</p>
         </div>
         <div class="results-toolbar reveal">
           <div class="method-identity">
             <span class="method-badge">5 methods</span>
             <div>
-              <strong>Complete comparison</strong>
-              <span data-result-configuration>800 videos · mask-region metrics</span>
+              <strong>Complete evaluation</strong>
+              <span data-result-configuration>5 completed methods · 1,631 videos · whole frame</span>
             </div>
           </div>
           <div class="results-actions">
+            <label class="result-select">
+              <span>Metrics</span>
+              <select data-results-metric-group aria-label="Metric region"></select>
+            </label>
             <label class="result-select">
               <span>Track</span>
               <select data-results-track aria-label="Result track"></select>
@@ -162,14 +166,7 @@
         <div class="table-wrap results-table overall-results reveal">
           <table>
             <thead>
-              <tr>
-                <th>Method</th>
-                <th>Videos</th>
-                <th>Mask PSNR† ↑</th>
-                <th>Mask MAE ↓</th>
-                <th>Mask MSE ↓</th>
-                <th>Mask Crop-SSIM ↑</th>
-              </tr>
+              <tr data-results-overall-head></tr>
             </thead>
             <tbody data-results-overall></tbody>
           </table>
@@ -177,7 +174,7 @@
         <div class="results-subhead reveal">
           <div>
             <h3>Breakdown by text type</h3>
-            <p>All completed methods on the selected benchmark slice.</p>
+            <p data-breakdown-description>Standard Subtitle · 232 videos · whole frame</p>
           </div>
           <label class="result-select">
             <span>Text type</span>
@@ -187,21 +184,35 @@
         <div class="table-wrap results-table reveal">
           <table>
             <thead>
-              <tr>
-                <th>Method</th>
-                <th>Videos</th>
-                <th>Mask PSNR† ↑</th>
-                <th>Mask MAE ↓</th>
-                <th>Mask MSE ↓</th>
-                <th>Mask Crop-SSIM ↑</th>
-              </tr>
+              <tr data-results-type-head></tr>
             </thead>
             <tbody data-results-by-type></tbody>
           </table>
         </div>
+        <p class="results-note reveal" data-results-note>
+          † Finite PSNR mean; zero-MSE videos are excluded only from that column.
+        </p>
+        <div class="results-subhead speed-results-head reveal">
+          <div>
+            <h3>Runtime</h3>
+            <p>Single-GPU wall time across all 1,631 videos.</p>
+          </div>
+        </div>
+        <div class="table-wrap results-table speed-results reveal">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Videos</th>
+                <th>Seconds / frame ↓</th>
+                <th>Throughput FPS ↑</th>
+              </tr>
+            </thead>
+            <tbody data-results-speed></tbody>
+          </table>
+        </div>
         <p class="results-note reveal">
-          † Finite mean. Zero-MSE videos produce infinite Mask PSNR and are excluded only
-          from that finite-mean column. All displayed values are measured inside dataset GT masks.
+          Runtime excludes one-time model initialization except for ProPainter, whose official launcher initializes models per clip.
         </p>
       </div>
     </section>
