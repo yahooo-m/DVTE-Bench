@@ -324,7 +324,7 @@ h1, h2, h3, p, figure, dl, dd, pre { margin: 0; }
   font-size: 12px;
 }
 .results-table { margin-top: 0; }
-.results-table table { min-width: 850px; }
+.results-table table { min-width: 720px; }
 .results-table th:not(:first-child),
 .results-table td:not(:first-child) { text-align: right; }
 .results-table td { font-variant-numeric: tabular-nums; }
@@ -341,8 +341,6 @@ h1, h2, h3, p, figure, dl, dd, pre { margin: 0; }
 }
 .results-subhead h3 { font-family: var(--serif); font-size: 25px; font-weight: 600; }
 .results-subhead p { margin-top: 4px; color: var(--muted); font-size: 12px; }
-.speed-results-head { margin-top: 50px; }
-.speed-results table { min-width: 620px; }
 .results-note { max-width: 900px; margin-top: 13px; color: var(--muted); font-size: 11px; }
 .explorer-section { color: #f4f6f8; background: #101317; }
 .explorer-section .eyebrow { color: #67cdce; }

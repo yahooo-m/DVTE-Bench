@@ -20,7 +20,6 @@
   let activeCase;
   let previewFilter = "all";
   let resultTrack = "all";
-  let resultMetricGroup = "whole";
   let resultType = "standard_subtitle";
   let catalogPage = 1;
   let filteredCatalog = [];
@@ -121,27 +120,12 @@
       `).join("");
   };
 
-  const RESULT_GROUPS = {
-    whole: {
-      label: "Whole frame",
-      metrics: [
-        { field: "psnr", label: "PSNR† ↑", digits: 2, direction: "max", infiniteField: "psnr_infinite_samples" },
-        { field: "ssim", label: "SSIM ↑", digits: 4, direction: "max" },
-        { field: "lpips", label: "LPIPS ↓", digits: 4, direction: "min" },
-        { field: "twe_pred", label: "TWE ↓", digits: 3, direction: "min" },
-        { field: "twe_gap", label: "|TWE - GT| ↓", digits: 3, direction: "min" },
-      ],
-    },
-    mask: {
-      label: "Mask region",
-      metrics: [
-        { field: "mask_psnr", label: "Mask PSNR† ↑", digits: 2, direction: "max", infiniteField: "mask_psnr_infinite_samples" },
-        { field: "mask_mae", label: "Mask MAE ↓", digits: 2, direction: "min" },
-        { field: "mask_mse", label: "Mask MSE ↓", digits: 2, direction: "min" },
-        { field: "mask_crop_ssim", label: "Crop-SSIM ↑", digits: 4, direction: "max" },
-      ],
-    },
-  };
+  const RESULT_METRICS = [
+    { field: "mask_psnr", label: "Mask PSNR† ↑", digits: 2, direction: "max", infiniteField: "mask_psnr_infinite_samples" },
+    { field: "mask_mae", label: "Mask MAE ↓", digits: 2, direction: "min" },
+    { field: "mask_mse", label: "Mask MSE ↓", digits: 2, direction: "min" },
+    { field: "mask_crop_ssim", label: "Crop-SSIM ↑", digits: 4, direction: "max" },
+  ];
   const formatMetric = (value, digits) => (
     value === null || !Number.isFinite(value) ? "n/a" : Number(value).toFixed(digits)
   );
@@ -150,8 +134,7 @@
     if (!definition.infiniteField) return value;
     const infinite = metrics[definition.infiniteField];
     const suffix = infinite ? "†" : "";
-    const label = definition.field === "psnr" ? "PSNR" : "Mask PSNR";
-    return `<span title="${infinite} infinite ${label} video${infinite === 1 ? "" : "s"}">${value}${suffix}</span>`;
+    return `<span title="${infinite} infinite Mask PSNR video${infinite === 1 ? "" : "s"}">${value}${suffix}</span>`;
   };
   const bestValue = (records, definition) => {
     const values = records
@@ -163,39 +146,22 @@
     target.innerHTML = `
       <th>Method</th>
       <th>Videos</th>
-      ${RESULT_GROUPS[resultMetricGroup].metrics.map((metric) => `<th>${metric.label}</th>`).join("")}
+      ${RESULT_METRICS.map((metric) => `<th>${metric.label}</th>`).join("")}
     `;
   };
   const renderResultTable = (target, records) => {
-    const definitions = RESULT_GROUPS[resultMetricGroup].metrics;
     const best = Object.fromEntries(
-      definitions.map((definition) => [definition.field, bestValue(records, definition)])
+      RESULT_METRICS.map((definition) => [definition.field, bestValue(records, definition)])
     );
     target.innerHTML = records.map(({ method, metrics }) => `
       <tr class="${method.id === "ours" ? "is-ours" : ""}">
         <td class="${method.id === "ours" ? "result-method" : ""}" title="${method.configuration}">${method.label}</td>
         <td>${formatNumber(metrics.samples)}</td>
-        ${definitions.map((definition) => {
+        ${RESULT_METRICS.map((definition) => {
           const value = metrics[definition.field];
           const isBest = value !== null && value === best[definition.field];
           return `<td class="${isBest ? "result-best" : ""}">${formatResultMetric(metrics, definition)}</td>`;
         }).join("")}
-      </tr>
-    `).join("");
-  };
-  const renderSpeedTable = (methods) => {
-    const fastestSeconds = Math.min(...methods.map((method) => method.speed.seconds_per_frame));
-    const fastestFps = Math.max(...methods.map((method) => method.speed.throughput_fps));
-    document.querySelector("[data-results-speed]").innerHTML = methods.map((method) => `
-      <tr class="${method.id === "ours" ? "is-ours" : ""}">
-        <td class="${method.id === "ours" ? "result-method" : ""}" title="${method.configuration}">${method.label}</td>
-        <td>${formatNumber(method.speed.samples)}</td>
-        <td class="${method.speed.seconds_per_frame === fastestSeconds ? "result-best" : ""}">
-          ${formatMetric(method.speed.seconds_per_frame, 3)}
-        </td>
-        <td class="${method.speed.throughput_fps === fastestFps ? "result-best" : ""}">
-          ${formatMetric(method.speed.throughput_fps, 3)}
-        </td>
       </tr>
     `).join("");
   };
@@ -215,48 +181,34 @@
     renderResultTable(document.querySelector("[data-results-by-type]"), typeRecords);
     const track = methods[0].tracks[resultTrack];
     const category = benchmark.categories.find((item) => item.id === resultType);
-    const group = RESULT_GROUPS[resultMetricGroup];
     document.querySelector("[data-result-configuration]").textContent =
-      `${methods.length} completed methods · ${formatNumber(track.samples)} videos · ${group.label.toLowerCase()}`;
+      `${methods.length} completed methods · ${formatNumber(track.samples)} videos · mask level`;
     document.querySelector("[data-breakdown-description]").textContent =
-      `${category.label} · ${formatNumber(typeRecords[0].metrics.samples)} videos · ${group.label.toLowerCase()}`;
-    document.querySelector("[data-results-note]").innerHTML = resultMetricGroup === "whole"
-      ? "† Finite PSNR mean; zero-MSE videos are excluded only from that column. TWE is reported with its absolute gap to clean-target TWE."
-      : "† Finite Mask PSNR mean; zero-MSE videos are excluded only from that column. Mask metrics use dataset GT masks.";
+      `${category.label} · ${formatNumber(typeRecords[0].metrics.samples)} videos · mask level`;
   };
   const renderResults = () => {
     const methods = benchmark.results.methods;
     const trackSelect = document.querySelector("[data-results-track]");
-    const groupSelect = document.querySelector("[data-results-metric-group]");
     const typeSelect = document.querySelector("[data-results-type]");
     trackSelect.innerHTML = ["all", "main", "seen"].map((trackId) => {
       const track = methods[0].tracks[trackId];
       return `<option value="${trackId}">${track.label} · ${track.samples}</option>`;
     }).join("");
-    groupSelect.innerHTML = Object.entries(RESULT_GROUPS).map(([id, group]) => (
-      `<option value="${id}">${group.label}</option>`
-    )).join("");
     typeSelect.innerHTML = benchmark.categories.map((category) => {
       const count = methods[0].byType[category.id].samples;
       const suffix = category.id === "asr_subtitle" ? " · seen" : "";
       return `<option value="${category.id}">${category.label}${suffix} · ${count}</option>`;
     }).join("");
     trackSelect.value = resultTrack;
-    groupSelect.value = resultMetricGroup;
     typeSelect.value = resultType;
     trackSelect.addEventListener("change", () => {
       resultTrack = trackSelect.value;
-      updateResultTables();
-    });
-    groupSelect.addEventListener("change", () => {
-      resultMetricGroup = groupSelect.value;
       updateResultTables();
     });
     typeSelect.addEventListener("change", () => {
       resultType = typeSelect.value;
       updateResultTables();
     });
-    renderSpeedTable(methods);
     updateResultTables();
   };
 

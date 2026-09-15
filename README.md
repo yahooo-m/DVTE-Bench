@@ -8,20 +8,20 @@ Project page: <https://yahooo-m.github.io/DVTE-Bench/>
 
 ## Results
 
-LingBot-40K and four public baselines were evaluated on all 1,631 videos.
-PSNR columns report the finite mean; lower LPIPS is better.
+Ours and four public baselines were evaluated on all 1,631 videos. All metrics
+below are measured inside the dataset ground-truth masks.
 
-| Method | Whole PSNR | SSIM | LPIPS | Mask PSNR | Seconds / frame |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| LingBot-40K | 37.805 | 0.9664 | **0.0262** | **31.348** | 1.744 |
-| CLEAR | 19.833 | 0.7567 | 0.1979 | 16.880 | 1.378 |
-| ProPainter | **38.940** | 0.9651 | 0.0345 | 26.152 | 0.661 |
-| MiniMax-Remover | 38.756 | **0.9676** | 0.0276 | 26.295 | **0.480** |
-| DiffuEraser | 37.969 | 0.9642 | 0.0301 | 24.963 | 2.954 |
+| Method | Mask PSNR | Mask MAE | Mask MSE | Crop-SSIM |
+| --- | ---: | ---: | ---: | ---: |
+| Ours | **31.348** | **5.449** | **131.153** | **0.9053** |
+| CLEAR | 16.880 | 33.470 | 2893.994 | 0.6193 |
+| ProPainter | 26.152 | 11.084 | 598.561 | 0.8246 |
+| MiniMax-Remover | 26.295 | 10.105 | 444.954 | 0.8399 |
+| DiffuEraser | 24.963 | 11.923 | 553.245 | 0.8129 |
 
-The project page includes whole-frame PSNR, SSIM, LPIPS, and TWE; mask-region
-PSNR, MAE, MSE, and Crop-SSIM; runtime; and per-type breakdowns. Download the
-machine-readable table from [`data/results.csv`](data/results.csv).
+The project page includes full-benchmark, track-level, and per-type mask-level
+breakdowns. Download the machine-readable table from
+[`data/results.csv`](data/results.csv).
 
 ## Local preview
 
@@ -46,8 +46,8 @@ Use `--force` to regenerate existing preview media. The builder:
 - selects two representative samples per type;
 - creates aligned Source, Target, and Mask previews;
 - generates separate posters for all three preview streams.
-- validates the completed full-benchmark evaluation and exports whole-frame,
-  mask-region, perceptual, temporal, runtime, and per-type metrics for all methods;
+- validates the completed full-benchmark evaluation and exports mask-level and
+  per-type metrics for all methods;
 - keeps the 1,563 main samples separate from the 68 seen ASR samples.
 
 The website package is intentionally small. It exposes the complete searchable

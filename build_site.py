@@ -137,26 +137,17 @@ PUBLIC_FIELDS = [
 ]
 
 RESULT_FIELDS = (
-    "psnr",
-    "psnr_infinite_samples",
-    "ssim",
-    "lpips",
-    "twe_pred",
-    "twe_gt",
-    "twe_gap",
     "mask_psnr",
     "mask_psnr_infinite_samples",
     "mask_mae",
     "mask_mse",
     "mask_crop_ssim",
-    "seconds_per_frame",
-    "throughput_fps",
 )
 
 METHODS = {
     "LingBot-40K": {
         "id": "ours",
-        "label": "LingBot-40K",
+        "label": "Ours",
         "configuration": "40K checkpoint · GT mask · 6 steps",
     },
     "CLEAR": {
@@ -336,19 +327,8 @@ def finite_or_none(value: object) -> float | None:
 
 
 def normalize_metrics(row: dict[str, object]) -> dict[str, object]:
-    twe_pred = finite_or_none(row["TWE_pred"])
-    twe_gt = finite_or_none(row["TWE_gt"])
-    if twe_pred is None or twe_gt is None:
-        raise ValueError("TWE means must be finite")
     return {
         "samples": int(row["Videos"]),
-        "psnr": finite_or_none(row["PSNR_finite_mean"]),
-        "psnr_infinite_samples": int(row["PSNR_infinite_videos"]),
-        "ssim": finite_or_none(row["SSIM"]),
-        "lpips": finite_or_none(row["LPIPS"]),
-        "twe_pred": twe_pred,
-        "twe_gt": twe_gt,
-        "twe_gap": abs(twe_pred - twe_gt),
         "mask_psnr": finite_or_none(row["MaskRegion_PSNR_finite_mean"]),
         "mask_psnr_infinite_samples": int(row["MaskRegion_PSNR_infinite_videos"]),
         "mask_mae": finite_or_none(row["MaskRegion_MAE"]),
@@ -364,9 +344,6 @@ def weighted_mean(rows: list[dict[str, object]], field: str) -> float:
 
 def aggregate_type_metrics(rows: list[dict[str, object]]) -> dict[str, object]:
     samples = sum(int(row["Videos"]) for row in rows)
-    psnr_finite_samples = sum(
-        int(row["Videos"]) - int(row["PSNR_infinite_videos"]) for row in rows
-    )
     mask_psnr_finite_samples = sum(
         int(row["Videos"]) - int(row["MaskRegion_PSNR_infinite_videos"])
         for row in rows
@@ -385,19 +362,8 @@ def aggregate_type_metrics(rows: list[dict[str, object]]) -> dict[str, object]:
                 total += value * finite_count
         return total / count
 
-    twe_pred = weighted_mean(rows, "TWE_pred")
-    twe_gt = weighted_mean(rows, "TWE_gt")
     return {
         "samples": samples,
-        "psnr": finite_psnr(
-            "PSNR_finite_mean", "PSNR_infinite_videos", psnr_finite_samples
-        ),
-        "psnr_infinite_samples": samples - psnr_finite_samples,
-        "ssim": weighted_mean(rows, "SSIM"),
-        "lpips": weighted_mean(rows, "LPIPS"),
-        "twe_pred": twe_pred,
-        "twe_gt": twe_gt,
-        "twe_gap": abs(twe_pred - twe_gt),
         "mask_psnr": finite_psnr(
             "MaskRegion_PSNR_finite_mean",
             "MaskRegion_PSNR_infinite_videos",
@@ -467,15 +433,6 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
                     category: normalize_metrics(type_rows[category])
                     for category in CATEGORY_ORDER
                 },
-                "speed": {
-                    "samples": int(summary_by_method[source_name]["Speed_videos"]),
-                    "seconds_per_frame": finite_or_none(
-                        summary_by_method[source_name]["Seconds_per_frame"]
-                    ),
-                    "throughput_fps": finite_or_none(
-                        summary_by_method[source_name]["Throughput_FPS"]
-                    ),
-                },
             }
         )
 
@@ -487,10 +444,11 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
             "seenSamples": 68,
             "selection": "Complete evaluation on all DVTE-Bench videos; seen ASR is reported separately.",
             "aggregation": source_protocol["aggregation"],
-            "metricScope": "Whole frame and dataset ground-truth mask region.",
+            "metricScope": "Dataset ground-truth mask region only.",
             "psnrPolicy": source_protocol["psnr_infinity"],
-            "speedPolicy": source_protocol["speed"],
-            "baselinePostprocess": source_protocol["baseline_postprocess"],
+            "baselinePostprocess": source_protocol["baseline_postprocess"].replace(
+                "LingBot", "Ours"
+            ),
             "selectedCounts": expected_counts,
         },
         "methods": methods,
@@ -507,8 +465,7 @@ def write_results_csv(results: dict[str, object]) -> None:
     rows: list[dict[str, object]] = []
     for method in results["methods"]:
         for track, metrics in method["tracks"].items():
-            speed = method["speed"] if track == "all" else {}
-            rows.append({"method": method["label"], "scope": track, **metrics, **speed})
+            rows.append({"method": method["label"], "scope": track, **metrics})
         for category, metrics in method["byType"].items():
             rows.append({"method": method["label"], "scope": category, **metrics})
     with (DATA_DIR / "results.csv").open("w", encoding="utf-8", newline="") as handle:
