@@ -19,7 +19,6 @@
   let benchmark;
   let activeCase;
   let previewFilter = "all";
-  let resultTrack = "all";
   let resultType = "standard_subtitle";
   let catalogPage = 1;
   let filteredCatalog = [];
@@ -167,9 +166,9 @@
   };
   const updateResultTables = () => {
     const methods = benchmark.results.methods;
-    const trackRecords = methods.map((method) => ({
+    const overallRecords = methods.map((method) => ({
       method,
-      metrics: method.tracks[resultTrack],
+      metrics: method.overall,
     }));
     const typeRecords = methods.map((method) => ({
       method,
@@ -177,34 +176,22 @@
     }));
     renderResultHeader(document.querySelector("[data-results-overall-head]"));
     renderResultHeader(document.querySelector("[data-results-type-head]"));
-    renderResultTable(document.querySelector("[data-results-overall]"), trackRecords);
+    renderResultTable(document.querySelector("[data-results-overall]"), overallRecords);
     renderResultTable(document.querySelector("[data-results-by-type]"), typeRecords);
-    const track = methods[0].tracks[resultTrack];
     const category = benchmark.categories.find((item) => item.id === resultType);
     document.querySelector("[data-result-configuration]").textContent =
-      `${methods.length} completed methods · ${formatNumber(track.samples)} videos · mask level`;
+      `${methods.length} completed methods · ${formatNumber(methods[0].overall.samples)} videos · mask level`;
     document.querySelector("[data-breakdown-description]").textContent =
       `${category.label} · ${formatNumber(typeRecords[0].metrics.samples)} videos · mask level`;
   };
   const renderResults = () => {
     const methods = benchmark.results.methods;
-    const trackSelect = document.querySelector("[data-results-track]");
     const typeSelect = document.querySelector("[data-results-type]");
-    trackSelect.innerHTML = ["all", "main", "seen"].map((trackId) => {
-      const track = methods[0].tracks[trackId];
-      return `<option value="${trackId}">${track.label} · ${track.samples}</option>`;
-    }).join("");
     typeSelect.innerHTML = benchmark.categories.map((category) => {
       const count = methods[0].byType[category.id].samples;
-      const suffix = category.id === "asr_subtitle" ? " · seen" : "";
-      return `<option value="${category.id}">${category.label}${suffix} · ${count}</option>`;
+      return `<option value="${category.id}">${category.label} · ${count}</option>`;
     }).join("");
-    trackSelect.value = resultTrack;
     typeSelect.value = resultType;
-    trackSelect.addEventListener("change", () => {
-      resultTrack = trackSelect.value;
-      updateResultTables();
-    });
     typeSelect.addEventListener("change", () => {
       resultType = typeSelect.value;
       updateResultTables();
@@ -317,7 +304,6 @@
       <div><dt>Duration</dt><dd>${item.duration.toFixed(2)} s</dd></div>
       <div><dt>Frame rate</dt><dd>${item.fps.toFixed(2)} fps</dd></div>
       <div><dt>Text regions</dt><dd>${item.overlays}</dd></div>
-      <div><dt>Track</dt><dd>${item.seen ? "ASR seen regression" : "Main synthetic"}</dd></div>
       <div><dt>Target audit</dt><dd>${titleCase(item.ocrStatus)}</dd></div>
     `;
     const index = benchmark.previews.indexOf(item) + 1;
@@ -374,7 +360,6 @@
   const catalogSearch = document.querySelector("[data-catalog-search]");
   const catalogType = document.querySelector("[data-catalog-type]");
   const catalogOrientation = document.querySelector("[data-catalog-orientation]");
-  const catalogTrack = document.querySelector("[data-catalog-track]");
   const previousPage = document.querySelector("[data-page-prev]");
   const nextPage = document.querySelector("[data-page-next]");
   const renderCatalog = () => {
@@ -383,8 +368,7 @@
       const searchText = `${item.id} ${item.type} ${item.language} ${item.text}`.toLocaleLowerCase();
       return (!query || searchText.includes(query))
         && (catalogType.value === "all" || item.type === catalogType.value)
-        && (catalogOrientation.value === "all" || item.orientation === catalogOrientation.value)
-        && (catalogTrack.value === "all" || item.track === catalogTrack.value);
+        && (catalogOrientation.value === "all" || item.orientation === catalogOrientation.value);
     });
     const pages = Math.max(1, Math.ceil(filteredCatalog.length / PAGE_SIZE));
     catalogPage = Math.min(catalogPage, pages);
@@ -398,7 +382,6 @@
         <td>${titleCase(item.orientation)} · ${item.width}×${item.height}</td>
         <td>${item.duration.toFixed(2)} s</td>
         <td>${item.overlays}</td>
-        <td><span class="track-chip ${item.seen ? "seen" : ""}">${item.seen ? "Seen regression" : "Main"}</span></td>
       </tr>
     `).join("");
     document.querySelector("[data-catalog-count]").textContent =
@@ -413,7 +396,7 @@
     renderCatalog();
   };
   catalogSearch.addEventListener("input", resetAndRenderCatalog);
-  [catalogType, catalogOrientation, catalogTrack].forEach((select) => {
+  [catalogType, catalogOrientation].forEach((select) => {
     select.addEventListener("change", resetAndRenderCatalog);
   });
   previousPage.addEventListener("click", () => {
@@ -453,7 +436,7 @@
 
   const initialize = async () => {
     try {
-      const response = await fetch("data/benchmark.json");
+      const response = await fetch("data/benchmark.json?v=full-1631");
       if (!response.ok) throw new Error(`Manifest request failed: ${response.status}`);
       benchmark = await response.json();
       renderStats();

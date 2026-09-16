@@ -466,8 +466,6 @@ th { color: var(--muted); background: var(--surface-2); font-size: 9px; text-tra
 td:first-child { max-width: 310px; overflow: hidden; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; text-overflow: ellipsis; }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr:hover { background: color-mix(in srgb, var(--teal-soft) 45%, transparent); }
-.track-chip { padding: 3px 6px; border-radius: 3px; color: var(--teal); background: var(--teal-soft); font-size: 9px; font-weight: 750; }
-.track-chip.seen { color: var(--yellow); background: var(--yellow-soft); }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 18px; color: var(--muted); font-size: 11px; }
 .pagination .icon-button:disabled { opacity: .35; cursor: not-allowed; }
 .data-section { background: var(--surface); }

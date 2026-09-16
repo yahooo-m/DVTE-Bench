@@ -6,9 +6,9 @@
   <meta name="description" content="DVTE-Bench (Diverse Video Text Erasure Benchmark) provides 1,631 paired clips across 8 text types for video text erasure evaluation.">
   <meta name="theme-color" content="#f4f6f8">
   <title>DVTE-Bench | Diverse Video Text Erasure Benchmark</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=full-1631">
   <script src="assets/vendor/lucide.min.js" defer></script>
-  <script src="app.js" defer></script>
+  <script src="app.js?v=full-1631" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -116,8 +116,8 @@
           <p>
             Every source clip has a clean target and a temporally aligned mask. Target frames
             were scanned under one OCR audit configuration; confirmed residual text caused
-            rejection. The ASR preview subset remains explicitly separated because it overlaps
-            a known training manifest.
+            rejection. All eight text types, including ASR subtitles, contribute to the same
+            1,631-video aggregate.
           </p>
         </div>
       </div>
@@ -150,10 +150,6 @@
             </div>
           </div>
           <div class="results-actions">
-            <label class="result-select">
-              <span>Track</span>
-              <select data-results-track aria-label="Result track"></select>
-            </label>
             <a class="button button-secondary" href="data/results.csv" download>
               <i data-lucide="download" aria-hidden="true"></i> Results CSV
             </a>
@@ -262,8 +258,8 @@
       <div class="shell">
         <div class="section-heading reveal">
           <p class="eyebrow">Composition</p>
-          <h2 id="composition-title">Balanced by challenge, explicit by split</h2>
-          <p>The main synthetic track spans all eight types; the seen ASR track is reported separately.</p>
+          <h2 id="composition-title">Balanced across diverse challenges</h2>
+          <p>All 1,631 videos contribute to the aggregate, with results also broken down by text type.</p>
         </div>
         <div class="composition-layout reveal">
           <div class="distribution" data-category-bars aria-label="Samples by benchmark type"></div>
@@ -293,7 +289,7 @@
         <div class="section-heading reveal">
           <p class="eyebrow">Protocol</p>
           <h2 id="protocol-title">A reproducible evaluation contract</h2>
-          <p>Keep track boundaries visible and compute restoration metrics against paired clean frames.</p>
+          <p>Evaluate every clip consistently against its paired clean reference and ground-truth mask.</p>
         </div>
         <div class="protocol-grid reveal">
           <article>
@@ -308,13 +304,13 @@
           </article>
           <article>
             <span>03</span>
-            <h3>Measure temporal quality</h3>
-            <p>Add a temporal or flow-aware measure so per-frame restoration cannot hide flicker.</p>
+            <h3>Evaluate all clips</h3>
+            <p>Compute the primary leaderboard over the complete set of 1,631 benchmark videos.</p>
           </article>
           <article>
             <span>04</span>
-            <h3>Separate seen samples</h3>
-            <p>Report the 68 ASR preview samples as a seen regression track, never as unseen test data.</p>
+            <h3>Break down by type</h3>
+            <p>Report all eight text categories separately to expose category-specific strengths and failures.</p>
           </article>
         </div>
         <aside class="audit-note reveal">
@@ -359,14 +355,6 @@
               <option value="landscape">Landscape</option>
             </select>
           </label>
-          <label>
-            <span>Track</span>
-            <select data-catalog-track>
-              <option value="all">All tracks</option>
-              <option value="vlm_multitype">Main synthetic</option>
-              <option value="asr_preview_seen">ASR seen regression</option>
-            </select>
-          </label>
           <span class="catalog-result-count" data-catalog-count>1,631 records</span>
         </div>
         <div class="table-wrap reveal">
@@ -379,7 +367,6 @@
                 <th>Format</th>
                 <th>Duration</th>
                 <th>Regions</th>
-                <th>Track</th>
               </tr>
             </thead>
             <tbody data-catalog-body></tbody>

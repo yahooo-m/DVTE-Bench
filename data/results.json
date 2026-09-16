@@ -1,9 +1,7 @@
 {
   "protocol": {
     "samples": 1631,
-    "mainSamples": 1563,
-    "seenSamples": 68,
-    "selection": "Complete evaluation on all DVTE-Bench videos; seen ASR is reported separately.",
+    "selection": "Complete evaluation on all 1,631 DVTE-Bench videos.",
     "aggregation": "per-frame -> video mean -> macro mean across the same 1631 videos",
     "metricScope": "Dataset ground-truth mask region only.",
     "psnrPolicy": "Raw PSNR retains infinity for zero-MSE videos; finite_mean and infinite_videos are reported for comparison.",
@@ -25,34 +23,13 @@
       "label": "Ours",
       "configuration": "40K checkpoint · GT mask · 6 steps",
       "coverage": 1631,
-      "tracks": {
-        "all": {
-          "label": "Full benchmark",
-          "samples": 1631,
-          "mask_psnr": 31.347652585941542,
-          "mask_psnr_infinite_samples": 13,
-          "mask_mae": 5.449027624645839,
-          "mask_mse": 131.15286220144878,
-          "mask_crop_ssim": 0.9052662644402967
-        },
-        "main": {
-          "label": "Main synthetic",
-          "samples": 1563,
-          "mask_psnr": 31.20442734264747,
-          "mask_psnr_infinite_samples": 13,
-          "mask_mae": 5.545245740098997,
-          "mask_mse": 135.3943710711655,
-          "mask_crop_ssim": 0.9043790976803329
-        },
-        "seen": {
-          "label": "ASR seen regression",
-          "samples": 68,
-          "mask_psnr": 34.612345631616506,
-          "mask_psnr_infinite_samples": 0,
-          "mask_mae": 3.237425941509585,
-          "mask_mse": 33.66053332840199,
-          "mask_crop_ssim": 0.9256580533494522
-        }
+      "overall": {
+        "samples": 1631,
+        "mask_psnr": 31.347652585941542,
+        "mask_psnr_infinite_samples": 13,
+        "mask_mae": 5.449027624645839,
+        "mask_mse": 131.15286220144878,
+        "mask_crop_ssim": 0.9052662644402967
       },
       "byType": {
         "standard_subtitle": {
@@ -126,34 +103,13 @@
       "label": "CLEAR",
       "configuration": "Official inference · mask-free",
       "coverage": 1631,
-      "tracks": {
-        "all": {
-          "label": "Full benchmark",
-          "samples": 1631,
-          "mask_psnr": 16.88008621189493,
-          "mask_psnr_infinite_samples": 1,
-          "mask_mae": 33.47010648231684,
-          "mask_mse": 2893.994440093893,
-          "mask_crop_ssim": 0.6193435122221034
-        },
-        "main": {
-          "label": "Main synthetic",
-          "samples": 1563,
-          "mask_psnr": 16.711209785176987,
-          "mask_psnr_infinite_samples": 1,
-          "mask_mae": 33.97346752007766,
-          "mask_mse": 2980.636140014179,
-          "mask_crop_ssim": 0.6121476272171851
-        },
-        "seen": {
-          "label": "ASR seen regression",
-          "samples": 68,
-          "mask_psnr": 20.75927707268093,
-          "mask_psnr_infinite_samples": 0,
-          "mask_mae": 21.900204982021016,
-          "mask_mse": 902.5094845732949,
-          "mask_crop_ssim": 0.7847430454969017
-        }
+      "overall": {
+        "samples": 1631,
+        "mask_psnr": 16.88008621189493,
+        "mask_psnr_infinite_samples": 1,
+        "mask_mae": 33.47010648231684,
+        "mask_mse": 2893.994440093893,
+        "mask_crop_ssim": 0.6193435122221034
       },
       "byType": {
         "standard_subtitle": {
@@ -227,34 +183,13 @@
       "label": "ProPainter",
       "configuration": "Official inference · GT mask paste-back",
       "coverage": 1631,
-      "tracks": {
-        "all": {
-          "label": "Full benchmark",
-          "samples": 1631,
-          "mask_psnr": 26.15189458049072,
-          "mask_psnr_infinite_samples": 12,
-          "mask_mae": 11.084115267839731,
-          "mask_mse": 598.560835858543,
-          "mask_crop_ssim": 0.8246309719710306
-        },
-        "main": {
-          "label": "Main synthetic",
-          "samples": 1563,
-          "mask_psnr": 25.983921564423532,
-          "mask_psnr_infinite_samples": 12,
-          "mask_mae": 11.340589150712352,
-          "mask_mse": 619.8896247011137,
-          "mask_crop_ssim": 0.8221824397797919
-        },
-        "seen": {
-          "label": "ASR seen regression",
-          "samples": 68,
-          "mask_psnr": 29.983161461671315,
-          "mask_psnr_infinite_samples": 0,
-          "mask_mae": 5.188987636517612,
-          "mask_mse": 108.31235113885879,
-          "mask_crop_ssim": 0.8809112045431744
-        }
+      "overall": {
+        "samples": 1631,
+        "mask_psnr": 26.15189458049072,
+        "mask_psnr_infinite_samples": 12,
+        "mask_mae": 11.084115267839731,
+        "mask_mse": 598.560835858543,
+        "mask_crop_ssim": 0.8246309719710306
       },
       "byType": {
         "standard_subtitle": {
@@ -328,34 +263,13 @@
       "label": "MiniMax-Remover",
       "configuration": "Official inference · GT mask paste-back",
       "coverage": 1631,
-      "tracks": {
-        "all": {
-          "label": "Full benchmark",
-          "samples": 1631,
-          "mask_psnr": 26.29491815984172,
-          "mask_psnr_infinite_samples": 3,
-          "mask_mae": 10.105201520367649,
-          "mask_mse": 444.95373418933946,
-          "mask_crop_ssim": 0.8398760250375396
-        },
-        "main": {
-          "label": "Main synthetic",
-          "samples": 1563,
-          "mask_psnr": 26.068142831339635,
-          "mask_psnr_infinite_samples": 3,
-          "mask_mae": 10.352084474767407,
-          "mask_mse": 461.3305162383594,
-          "mask_crop_ssim": 0.8367099716919218
-        },
-        "seen": {
-          "label": "ASR seen regression",
-          "samples": 68,
-          "mask_psnr": 31.497410990183713,
-          "mask_psnr_infinite_samples": 0,
-          "mask_mae": 4.430524200855704,
-          "mask_mse": 68.528582092017,
-          "mask_crop_ssim": 0.9126486923786965
-        }
+      "overall": {
+        "samples": 1631,
+        "mask_psnr": 26.29491815984172,
+        "mask_psnr_infinite_samples": 3,
+        "mask_mae": 10.105201520367649,
+        "mask_mse": 444.95373418933946,
+        "mask_crop_ssim": 0.8398760250375396
       },
       "byType": {
         "standard_subtitle": {
@@ -429,34 +343,13 @@
       "label": "DiffuEraser",
       "configuration": "Official inference · GT mask paste-back",
       "coverage": 1631,
-      "tracks": {
-        "all": {
-          "label": "Full benchmark",
-          "samples": 1631,
-          "mask_psnr": 24.963253002000563,
-          "mask_psnr_infinite_samples": 14,
-          "mask_mae": 11.922871156683275,
-          "mask_mse": 553.244638708213,
-          "mask_crop_ssim": 0.8129019318442628
-        },
-        "main": {
-          "label": "Main synthetic",
-          "samples": 1563,
-          "mask_psnr": 24.81917378688813,
-          "mask_psnr_infinite_samples": 14,
-          "mask_mae": 12.14783841713348,
-          "mask_mse": 571.6787821167803,
-          "mask_crop_ssim": 0.8109537538903742
-        },
-        "seen": {
-          "label": "ASR seen regression",
-          "samples": 68,
-          "mask_psnr": 28.24529276978302,
-          "mask_psnr_infinite_samples": 0,
-          "mask_mae": 6.751932508394017,
-          "mask_mse": 129.53043065541505,
-          "mask_crop_ssim": 0.8576813751079122
-        }
+      "overall": {
+        "samples": 1631,
+        "mask_psnr": 24.963253002000563,
+        "mask_psnr_infinite_samples": 14,
+        "mask_mae": 11.922871156683275,
+        "mask_mse": 553.244638708213,
+        "mask_crop_ssim": 0.8129019318442628
       },
       "byType": {
         "standard_subtitle": {

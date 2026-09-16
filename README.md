@@ -19,8 +19,8 @@ below are measured inside the dataset ground-truth masks.
 | MiniMax-Remover | 26.295 | 10.105 | 444.954 | 0.8399 |
 | DiffuEraser | 24.963 | 11.923 | 553.245 | 0.8129 |
 
-The project page includes full-benchmark, track-level, and per-type mask-level
-breakdowns. Download the machine-readable table from
+The project page reports one full-benchmark leaderboard over all 1,631 videos,
+plus per-type mask-level breakdowns. Download the machine-readable table from
 [`data/results.csv`](data/results.csv).
 
 ## Local preview
@@ -48,7 +48,7 @@ Use `--force` to regenerate existing preview media. The builder:
 - generates separate posters for all three preview streams.
 - validates the completed full-benchmark evaluation and exports mask-level and
   per-type metrics for all methods;
-- keeps the 1,563 main samples separate from the 68 seen ASR samples.
+- aggregates all 1,631 videos into one primary leaderboard.
 
 The website package is intentionally small. It exposes the complete searchable
 metadata catalog but only 16 compressed media previews, rather than copying the
@@ -63,8 +63,3 @@ root. No build command is required after `build_site.py` has been run.
 For GitHub Pages, place these files at the repository root or configure a Pages
 workflow to upload this directory. The included `.nojekyll` file prevents asset
 paths from being rewritten.
-
-## Evaluation note
-
-The 68 `asr_preview_seen` samples overlap a known training manifest. They must
-be reported as a seen regression track and not merged into unseen test results.

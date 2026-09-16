@@ -75,7 +75,7 @@ CATEGORY_META = {
     "asr_subtitle": {
         "label": "ASR Subtitle",
         "short": "ASR",
-        "description": "Speech-aligned multilingual captions retained as a seen regression track.",
+        "description": "Speech-aligned multilingual captions with natural timing and layout variation.",
     },
 }
 
@@ -337,45 +337,6 @@ def normalize_metrics(row: dict[str, object]) -> dict[str, object]:
     }
 
 
-def weighted_mean(rows: list[dict[str, object]], field: str) -> float:
-    weighted_sum = sum(float(row[field]) * int(row["Videos"]) for row in rows)
-    return weighted_sum / sum(int(row["Videos"]) for row in rows)
-
-
-def aggregate_type_metrics(rows: list[dict[str, object]]) -> dict[str, object]:
-    samples = sum(int(row["Videos"]) for row in rows)
-    mask_psnr_finite_samples = sum(
-        int(row["Videos"]) - int(row["MaskRegion_PSNR_infinite_videos"])
-        for row in rows
-    )
-
-    def finite_psnr(field: str, count_field: str, count: int) -> float | None:
-        if count == 0:
-            return None
-        total = 0.0
-        for row in rows:
-            finite_count = int(row["Videos"]) - int(row[count_field])
-            value = finite_or_none(row[field])
-            if finite_count and value is None:
-                raise ValueError(f"Missing {field} with {finite_count} finite samples")
-            if value is not None:
-                total += value * finite_count
-        return total / count
-
-    return {
-        "samples": samples,
-        "mask_psnr": finite_psnr(
-            "MaskRegion_PSNR_finite_mean",
-            "MaskRegion_PSNR_infinite_videos",
-            mask_psnr_finite_samples,
-        ),
-        "mask_psnr_infinite_samples": samples - mask_psnr_finite_samples,
-        "mask_mae": weighted_mean(rows, "MaskRegion_MAE"),
-        "mask_mse": weighted_mean(rows, "MaskRegion_MSE"),
-        "mask_crop_ssim": weighted_mean(rows, "MaskRegionCrop_SSIM"),
-    }
-
-
 def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
     required = (
         COMPARISON_SUMMARY_JSON,
@@ -416,19 +377,11 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
                 raise ValueError(f"Unexpected {category} coverage for {source_name}")
 
         all_metrics = normalize_metrics(summary_by_method[source_name])
-        main_metrics = aggregate_type_metrics(
-            [type_rows[category] for category in CATEGORY_ORDER if category != "asr_subtitle"]
-        )
-        seen_metrics = normalize_metrics(type_rows["asr_subtitle"])
         methods.append(
             {
                 **metadata,
                 "coverage": 1631,
-                "tracks": {
-                    "all": {"label": "Full benchmark", **all_metrics},
-                    "main": {"label": "Main synthetic", **main_metrics},
-                    "seen": {"label": "ASR seen regression", **seen_metrics},
-                },
+                "overall": all_metrics,
                 "byType": {
                     category: normalize_metrics(type_rows[category])
                     for category in CATEGORY_ORDER
@@ -440,9 +393,7 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
     return {
         "protocol": {
             "samples": 1631,
-            "mainSamples": 1563,
-            "seenSamples": 68,
-            "selection": "Complete evaluation on all DVTE-Bench videos; seen ASR is reported separately.",
+            "selection": "Complete evaluation on all 1,631 DVTE-Bench videos.",
             "aggregation": source_protocol["aggregation"],
             "metricScope": "Dataset ground-truth mask region only.",
             "psnrPolicy": source_protocol["psnr_infinity"],
@@ -464,8 +415,7 @@ def write_results_csv(results: dict[str, object]) -> None:
     ]
     rows: list[dict[str, object]] = []
     for method in results["methods"]:
-        for track, metrics in method["tracks"].items():
-            rows.append({"method": method["label"], "scope": track, **metrics})
+        rows.append({"method": method["label"], "scope": "overall", **method["overall"]})
         for category, metrics in method["byType"].items():
             rows.append({"method": method["label"], "scope": category, **metrics})
     with (DATA_DIR / "results.csv").open("w", encoding="utf-8", newline="") as handle:
