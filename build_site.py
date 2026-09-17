@@ -137,11 +137,24 @@ PUBLIC_FIELDS = [
 ]
 
 RESULT_FIELDS = (
+    "psnr",
+    "psnr_infinite_samples",
+    "ssim",
+    "lpips",
+    "twe_pred",
+    "twe_gt",
+    "twe_gap",
     "mask_psnr",
     "mask_psnr_infinite_samples",
     "mask_mae",
     "mask_mse",
     "mask_crop_ssim",
+)
+
+SPEED_FIELDS = (
+    "speed_samples",
+    "seconds_per_frame",
+    "throughput_fps",
 )
 
 METHODS = {
@@ -327,8 +340,19 @@ def finite_or_none(value: object) -> float | None:
 
 
 def normalize_metrics(row: dict[str, object]) -> dict[str, object]:
+    twe_pred = finite_or_none(row["TWE_pred"])
+    twe_gt = finite_or_none(row["TWE_gt"])
+    if twe_pred is None or twe_gt is None:
+        raise ValueError("TWE means must be finite")
     return {
         "samples": int(row["Videos"]),
+        "psnr": finite_or_none(row["PSNR_finite_mean"]),
+        "psnr_infinite_samples": int(row["PSNR_infinite_videos"]),
+        "ssim": finite_or_none(row["SSIM"]),
+        "lpips": finite_or_none(row["LPIPS"]),
+        "twe_pred": twe_pred,
+        "twe_gt": twe_gt,
+        "twe_gap": abs(twe_pred - twe_gt),
         "mask_psnr": finite_or_none(row["MaskRegion_PSNR_finite_mean"]),
         "mask_psnr_infinite_samples": int(row["MaskRegion_PSNR_infinite_videos"]),
         "mask_mae": finite_or_none(row["MaskRegion_MAE"]),
@@ -386,6 +410,15 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
                     category: normalize_metrics(type_rows[category])
                     for category in CATEGORY_ORDER
                 },
+                "speed": {
+                    "samples": int(summary_by_method[source_name]["Speed_videos"]),
+                    "seconds_per_frame": finite_or_none(
+                        summary_by_method[source_name]["Seconds_per_frame"]
+                    ),
+                    "throughput_fps": finite_or_none(
+                        summary_by_method[source_name]["Throughput_FPS"]
+                    ),
+                },
             }
         )
 
@@ -395,8 +428,12 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
             "samples": 1631,
             "selection": "Complete evaluation on all 1,631 DVTE-Bench videos.",
             "aggregation": source_protocol["aggregation"],
-            "metricScope": "Dataset ground-truth mask region only.",
+            "metricScope": (
+                "Whole frame, perceptual, temporal, and dataset ground-truth "
+                "mask region."
+            ),
             "psnrPolicy": source_protocol["psnr_infinity"],
+            "speedPolicy": source_protocol["speed"].replace("LingBot", "Ours"),
             "baselinePostprocess": source_protocol["baseline_postprocess"].replace(
                 "LingBot", "Ours"
             ),
@@ -412,10 +449,21 @@ def write_results_csv(results: dict[str, object]) -> None:
         "scope",
         "samples",
         *RESULT_FIELDS,
+        *SPEED_FIELDS,
     ]
     rows: list[dict[str, object]] = []
     for method in results["methods"]:
-        rows.append({"method": method["label"], "scope": "overall", **method["overall"]})
+        speed = method["speed"]
+        rows.append(
+            {
+                "method": method["label"],
+                "scope": "overall",
+                **method["overall"],
+                "speed_samples": speed["samples"],
+                "seconds_per_frame": speed["seconds_per_frame"],
+                "throughput_fps": speed["throughput_fps"],
+            }
+        )
         for category, metrics in method["byType"].items():
             rows.append({"method": method["label"], "scope": category, **metrics})
     with (DATA_DIR / "results.csv").open("w", encoding="utf-8", newline="") as handle:

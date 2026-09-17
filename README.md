@@ -8,20 +8,29 @@ Project page: <https://yahooo-m.github.io/DVTE-Bench/>
 
 ## Results
 
-Ours and four public baselines were evaluated on all 1,631 videos. All metrics
-below are measured inside the dataset ground-truth masks.
+Ours and four public baselines were evaluated on all 1,631 videos. PSNR columns
+report the finite mean. Lower LPIPS and TWE gap are better; TWE GT is the
+clean-target reference.
 
-| Method | Mask PSNR | Mask MAE | Mask MSE | Crop-SSIM |
-| --- | ---: | ---: | ---: | ---: |
-| Ours | **31.348** | **5.449** | **131.153** | **0.9053** |
-| CLEAR | 16.880 | 33.470 | 2893.994 | 0.6193 |
-| ProPainter | 26.152 | 11.084 | 598.561 | 0.8246 |
-| MiniMax-Remover | 26.295 | 10.105 | 444.954 | 0.8399 |
-| DiffuEraser | 24.963 | 11.923 | 553.245 | 0.8129 |
+| Method | Whole PSNR | SSIM | LPIPS | TWE Pred | TWE GT | \|TWE - GT\| |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Ours | 37.805 | 0.9664 | **0.0262** | 9.065 | 9.121 | **0.056** |
+| CLEAR | 19.833 | 0.7567 | 0.1979 | 9.751 | 9.121 | 0.630 |
+| ProPainter | **38.940** | 0.9651 | 0.0345 | **8.985** | 9.121 | 0.135 |
+| MiniMax-Remover | 38.756 | **0.9676** | 0.0276 | 9.035 | 9.121 | 0.086 |
+| DiffuEraser | 37.969 | 0.9642 | 0.0301 | 9.186 | 9.121 | 0.065 |
+
+| Method | Mask PSNR | Mask MAE | Mask MSE | Crop-SSIM | Timed videos | Seconds / frame | FPS |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Ours | **31.348** | **5.449** | **131.153** | **0.9053** | 128 | 1.470 | 0.680 |
+| CLEAR | 16.880 | 33.470 | 2893.994 | 0.6193 | 1,631 | 1.378 | 0.726 |
+| ProPainter | 26.152 | 11.084 | 598.561 | 0.8246 | 1,631 | 0.661 | 1.512 |
+| MiniMax-Remover | 26.295 | 10.105 | 444.954 | 0.8399 | 1,631 | **0.480** | **2.085** |
+| DiffuEraser | 24.963 | 11.923 | 553.245 | 0.8129 | 1,631 | 2.954 | 0.339 |
 
 The project page reports one full-benchmark leaderboard over all 1,631 videos,
-plus per-type mask-level breakdowns. Download the machine-readable table from
-[`data/results.csv`](data/results.csv).
+plus per-type whole-frame, perceptual, temporal, and mask-region breakdowns.
+Download the machine-readable table from [`data/results.csv`](data/results.csv).
 
 ## Local preview
 
@@ -46,8 +55,8 @@ Use `--force` to regenerate existing preview media. The builder:
 - selects two representative samples per type;
 - creates aligned Source, Target, and Mask previews;
 - generates separate posters for all three preview streams.
-- validates the completed full-benchmark evaluation and exports mask-level and
-  per-type metrics for all methods;
+- validates the completed full-benchmark evaluation and exports whole-frame,
+  perceptual, temporal, mask-region, runtime, and per-type metrics for all methods;
 - aggregates all 1,631 videos into one primary leaderboard.
 
 The website package is intentionally small. It exposes the complete searchable
