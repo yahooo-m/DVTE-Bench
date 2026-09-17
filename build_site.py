@@ -137,13 +137,6 @@ PUBLIC_FIELDS = [
 ]
 
 RESULT_FIELDS = (
-    "psnr",
-    "psnr_infinite_samples",
-    "ssim",
-    "lpips",
-    "twe_pred",
-    "twe_gt",
-    "twe_gap",
     "mask_psnr",
     "mask_psnr_infinite_samples",
     "mask_mae",
@@ -152,10 +145,19 @@ RESULT_FIELDS = (
 )
 
 SPEED_FIELDS = (
+    "runtime_setting",
     "speed_samples",
     "seconds_per_frame",
     "throughput_fps",
 )
+
+RUNTIME_SETTINGS = {
+    "LingBot-40K": "768s + 4-step SEdit",
+    "CLEAR": "Official inference",
+    "ProPainter": "Official inference",
+    "MiniMax-Remover": "Official inference",
+    "DiffuEraser": "Official inference",
+}
 
 METHODS = {
     "LingBot-40K": {
@@ -340,19 +342,8 @@ def finite_or_none(value: object) -> float | None:
 
 
 def normalize_metrics(row: dict[str, object]) -> dict[str, object]:
-    twe_pred = finite_or_none(row["TWE_pred"])
-    twe_gt = finite_or_none(row["TWE_gt"])
-    if twe_pred is None or twe_gt is None:
-        raise ValueError("TWE means must be finite")
     return {
         "samples": int(row["Videos"]),
-        "psnr": finite_or_none(row["PSNR_finite_mean"]),
-        "psnr_infinite_samples": int(row["PSNR_infinite_videos"]),
-        "ssim": finite_or_none(row["SSIM"]),
-        "lpips": finite_or_none(row["LPIPS"]),
-        "twe_pred": twe_pred,
-        "twe_gt": twe_gt,
-        "twe_gap": abs(twe_pred - twe_gt),
         "mask_psnr": finite_or_none(row["MaskRegion_PSNR_finite_mean"]),
         "mask_psnr_infinite_samples": int(row["MaskRegion_PSNR_infinite_videos"]),
         "mask_mae": finite_or_none(row["MaskRegion_MAE"]),
@@ -411,6 +402,7 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
                     for category in CATEGORY_ORDER
                 },
                 "speed": {
+                    "setting": RUNTIME_SETTINGS[source_name],
                     "samples": int(summary_by_method[source_name]["Speed_videos"]),
                     "seconds_per_frame": finite_or_none(
                         summary_by_method[source_name]["Seconds_per_frame"]
@@ -428,12 +420,19 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
             "samples": 1631,
             "selection": "Complete evaluation on all 1,631 DVTE-Bench videos.",
             "aggregation": source_protocol["aggregation"],
-            "metricScope": (
-                "Whole frame, perceptual, temporal, and dataset ground-truth "
-                "mask region."
+            "metricScope": "Dataset ground-truth mask region only.",
+            "maskPsnrPolicy": source_protocol["psnr_infinity"].replace(
+                "Raw PSNR", "Raw Mask PSNR"
             ),
-            "psnrPolicy": source_protocol["psnr_infinity"],
-            "speedPolicy": source_protocol["speed"].replace("LingBot", "Ours"),
+            "speedPolicy": (
+                "Ours uses a deterministic 128-case timing sample at 768s with "
+                "one warmup per GPU and logged 4-step SEdit diffusion only "
+                "(excludes OCR, Qwen, model initialization, video I/O, "
+                "paste-back, and encoding). CLEAR/MiniMax/DiffuEraser use "
+                "single-GPU per-video wall time excluding one-time model "
+                "initialization. The official ProPainter launcher initializes "
+                "models per clip, so its wall time includes that overhead."
+            ),
             "baselinePostprocess": source_protocol["baseline_postprocess"].replace(
                 "LingBot", "Ours"
             ),
@@ -459,6 +458,7 @@ def write_results_csv(results: dict[str, object]) -> None:
                 "method": method["label"],
                 "scope": "overall",
                 **method["overall"],
+                "runtime_setting": speed["setting"],
                 "speed_samples": speed["samples"],
                 "seconds_per_frame": speed["seconds_per_frame"],
                 "throughput_fps": speed["throughput_fps"],

@@ -6,9 +6,9 @@
   <meta name="description" content="DVTE-Bench (Diverse Video Text Erasure Benchmark) provides 1,631 paired clips across 8 text types for video text erasure evaluation.">
   <meta name="theme-color" content="#f4f6f8">
   <title>DVTE-Bench | Diverse Video Text Erasure Benchmark</title>
-  <link rel="stylesheet" href="styles.css?v=all-metrics">
+  <link rel="stylesheet" href="styles.css?v=mask-runtime">
   <script src="assets/vendor/lucide.min.js" defer></script>
-  <script src="app.js?v=all-metrics" defer></script>
+  <script src="app.js?v=mask-runtime" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -138,22 +138,18 @@
       <div class="shell">
         <div class="section-heading reveal">
           <p class="eyebrow">Benchmark Results</p>
-          <h2 id="results-title">Complete benchmark leaderboard</h2>
-          <p>Five methods evaluated on all 1,631 clips with whole-frame, perceptual, temporal, mask-region, and runtime metrics.</p>
+          <h2 id="results-title">Mask-region leaderboard</h2>
+          <p>Five methods evaluated on all 1,631 clips inside the dataset ground-truth masks.</p>
         </div>
         <div class="results-toolbar reveal">
           <div class="method-identity">
             <span class="method-badge">5 methods</span>
             <div>
               <strong>Complete evaluation</strong>
-              <span data-result-configuration>5 completed methods · 1,631 videos · whole + temporal</span>
+              <span data-result-configuration>5 completed methods · 1,631 videos · mask region</span>
             </div>
           </div>
           <div class="results-actions">
-            <label class="result-select">
-              <span>Metrics</span>
-              <select data-results-metric-group aria-label="Metric group"></select>
-            </label>
             <a class="button button-secondary" href="data/results.csv" download>
               <i data-lucide="download" aria-hidden="true"></i> Results CSV
             </a>
@@ -170,7 +166,7 @@
         <div class="results-subhead reveal">
           <div>
             <h3>Breakdown by text type</h3>
-            <p data-breakdown-description>Standard Subtitle · 232 videos · whole + temporal</p>
+            <p data-breakdown-description>Standard Subtitle · 232 videos · mask region</p>
           </div>
           <label class="result-select">
             <span>Text type</span>
@@ -186,8 +182,8 @@
           </table>
         </div>
         <p class="results-note reveal" data-results-note>
-          † Finite PSNR mean; zero-MSE videos are excluded only from that column.
-          TWE (GT) is the clean-target reference, and |TWE - GT| measures the absolute gap.
+          † Finite Mask PSNR mean; zero-MSE videos are excluded only from that column.
+          All displayed quality metrics use dataset ground-truth masks.
         </p>
         <div class="results-subhead speed-results-head reveal">
           <div>
@@ -200,6 +196,7 @@
             <thead>
               <tr>
                 <th>Method</th>
+                <th>Setting</th>
                 <th>Timed videos</th>
                 <th>Seconds / frame ↓</th>
                 <th>Throughput FPS ↑</th>
@@ -209,9 +206,10 @@
           </table>
         </div>
         <p class="results-note reveal">
-          Ours reports 4-step SEdit inference on a deterministic 128-video sample, excluding OCR,
-          Qwen, I/O, paste-back, and encoding. Baseline timings exclude one-time initialization,
-          except ProPainter's official per-clip launcher.
+          Ours reports 768s, 4-step SEdit diffusion on a deterministic 128-video sample,
+          excluding OCR, Qwen, model initialization, video I/O, paste-back, and encoding.
+          Baseline timings exclude one-time initialization, except ProPainter's official
+          per-clip launcher.
         </p>
       </div>
     </section>
@@ -327,13 +325,13 @@
           </article>
           <article>
             <span>02</span>
-            <h3>Report full + masked</h3>
-            <p>Pair whole-frame PSNR, SSIM, and LPIPS with Mask PSNR, MAE, MSE, and Crop-SSIM.</p>
+            <h3>Report mask region</h3>
+            <p>Measure Mask PSNR, MAE, MSE, and Crop-SSIM inside the provided ground-truth masks.</p>
           </article>
           <article>
             <span>03</span>
-            <h3>Measure temporal quality</h3>
-            <p>Report prediction TWE, clean-target TWE, and their absolute gap to expose temporal inconsistency.</p>
+            <h3>Disclose runtime setup</h3>
+            <p>Report resolution, denoising steps, timed scope, sample count, and throughput with every speed result.</p>
           </article>
           <article>
             <span>04</span>

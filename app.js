@@ -19,7 +19,6 @@
   let benchmark;
   let activeCase;
   let previewFilter = "all";
-  let resultMetricGroup = "whole";
   let resultType = "standard_subtitle";
   let catalogPage = 1;
   let filteredCatalog = [];
@@ -120,28 +119,12 @@
       `).join("");
   };
 
-  const RESULT_GROUPS = {
-    whole: {
-      label: "Whole + temporal",
-      metrics: [
-        { field: "psnr", label: "PSNR† ↑", digits: 2, direction: "max", infiniteField: "psnr_infinite_samples" },
-        { field: "ssim", label: "SSIM ↑", digits: 4, direction: "max" },
-        { field: "lpips", label: "LPIPS ↓", digits: 4, direction: "min" },
-        { field: "twe_pred", label: "TWE (Pred.) ↓", digits: 3, direction: "min" },
-        { field: "twe_gt", label: "TWE (GT)", digits: 3 },
-        { field: "twe_gap", label: "|TWE - GT| ↓", digits: 3, direction: "min" },
-      ],
-    },
-    mask: {
-      label: "Mask region",
-      metrics: [
-        { field: "mask_psnr", label: "Mask PSNR† ↑", digits: 2, direction: "max", infiniteField: "mask_psnr_infinite_samples" },
-        { field: "mask_mae", label: "Mask MAE ↓", digits: 2, direction: "min" },
-        { field: "mask_mse", label: "Mask MSE ↓", digits: 2, direction: "min" },
-        { field: "mask_crop_ssim", label: "Crop-SSIM ↑", digits: 4, direction: "max" },
-      ],
-    },
-  };
+  const RESULT_METRICS = [
+    { field: "mask_psnr", label: "Mask PSNR† ↑", digits: 2, direction: "max", infiniteField: "mask_psnr_infinite_samples" },
+    { field: "mask_mae", label: "Mask MAE ↓", digits: 2, direction: "min" },
+    { field: "mask_mse", label: "Mask MSE ↓", digits: 2, direction: "min" },
+    { field: "mask_crop_ssim", label: "Crop-SSIM ↑", digits: 4, direction: "max" },
+  ];
   const formatMetric = (value, digits) => (
     value === null || !Number.isFinite(value) ? "n/a" : Number(value).toFixed(digits)
   );
@@ -150,8 +133,7 @@
     if (!definition.infiniteField) return value;
     const infinite = metrics[definition.infiniteField];
     const suffix = infinite ? "†" : "";
-    const label = definition.field === "psnr" ? "PSNR" : "Mask PSNR";
-    return `<span title="${infinite} infinite ${label} video${infinite === 1 ? "" : "s"}">${value}${suffix}</span>`;
+    return `<span title="${infinite} infinite Mask PSNR video${infinite === 1 ? "" : "s"}">${value}${suffix}</span>`;
   };
   const bestValue = (records, definition) => {
     if (!definition.direction) return null;
@@ -164,19 +146,18 @@
     target.innerHTML = `
       <th>Method</th>
       <th>Videos</th>
-      ${RESULT_GROUPS[resultMetricGroup].metrics.map((metric) => `<th>${metric.label}</th>`).join("")}
+      ${RESULT_METRICS.map((metric) => `<th>${metric.label}</th>`).join("")}
     `;
   };
   const renderResultTable = (target, records) => {
-    const definitions = RESULT_GROUPS[resultMetricGroup].metrics;
     const best = Object.fromEntries(
-      definitions.map((definition) => [definition.field, bestValue(records, definition)])
+      RESULT_METRICS.map((definition) => [definition.field, bestValue(records, definition)])
     );
     target.innerHTML = records.map(({ method, metrics }) => `
       <tr class="${method.id === "ours" ? "is-ours" : ""}">
         <td class="${method.id === "ours" ? "result-method" : ""}" title="${method.configuration}">${method.label}</td>
         <td>${formatNumber(metrics.samples)}</td>
-        ${definitions.map((definition) => {
+        ${RESULT_METRICS.map((definition) => {
           const value = metrics[definition.field];
           const isBest = best[definition.field] !== null && value === best[definition.field];
           return `<td class="${isBest ? "result-best" : ""}">${formatResultMetric(metrics, definition)}</td>`;
@@ -189,7 +170,8 @@
     const fastestFps = Math.max(...methods.map((method) => method.speed.throughput_fps));
     document.querySelector("[data-results-speed]").innerHTML = methods.map((method) => `
       <tr class="${method.id === "ours" ? "is-ours" : ""}">
-        <td class="${method.id === "ours" ? "result-method" : ""}" title="${method.configuration}">${method.label}</td>
+        <td class="${method.id === "ours" ? "result-method" : ""}" title="${method.speed.setting}">${method.label}</td>
+        <td>${method.speed.setting}</td>
         <td>${formatNumber(method.speed.samples)}</td>
         <td class="${method.speed.seconds_per_frame === fastestSeconds ? "result-best" : ""}">
           ${formatMetric(method.speed.seconds_per_frame, 3)}
@@ -215,32 +197,19 @@
     renderResultTable(document.querySelector("[data-results-overall]"), overallRecords);
     renderResultTable(document.querySelector("[data-results-by-type]"), typeRecords);
     const category = benchmark.categories.find((item) => item.id === resultType);
-    const group = RESULT_GROUPS[resultMetricGroup];
     document.querySelector("[data-result-configuration]").textContent =
-      `${methods.length} completed methods · ${formatNumber(methods[0].overall.samples)} videos · ${group.label.toLowerCase()}`;
+      `${methods.length} completed methods · ${formatNumber(methods[0].overall.samples)} videos · mask region`;
     document.querySelector("[data-breakdown-description]").textContent =
-      `${category.label} · ${formatNumber(typeRecords[0].metrics.samples)} videos · ${group.label.toLowerCase()}`;
-    document.querySelector("[data-results-note]").innerHTML = resultMetricGroup === "whole"
-      ? "† Finite PSNR mean; zero-MSE videos are excluded only from that column. TWE (GT) is the clean-target reference, and |TWE - GT| measures the absolute gap."
-      : "† Finite Mask PSNR mean; zero-MSE videos are excluded only from that column. Mask metrics use dataset ground-truth masks.";
+      `${category.label} · ${formatNumber(typeRecords[0].metrics.samples)} videos · mask region`;
   };
   const renderResults = () => {
     const methods = benchmark.results.methods;
-    const groupSelect = document.querySelector("[data-results-metric-group]");
     const typeSelect = document.querySelector("[data-results-type]");
-    groupSelect.innerHTML = Object.entries(RESULT_GROUPS).map(([id, group]) => (
-      `<option value="${id}">${group.label}</option>`
-    )).join("");
     typeSelect.innerHTML = benchmark.categories.map((category) => {
       const count = methods[0].byType[category.id].samples;
       return `<option value="${category.id}">${category.label} · ${count}</option>`;
     }).join("");
-    groupSelect.value = resultMetricGroup;
     typeSelect.value = resultType;
-    groupSelect.addEventListener("change", () => {
-      resultMetricGroup = groupSelect.value;
-      updateResultTables();
-    });
     typeSelect.addEventListener("change", () => {
       resultType = typeSelect.value;
       updateResultTables();
@@ -486,7 +455,7 @@
 
   const initialize = async () => {
     try {
-      const response = await fetch("data/benchmark.json?v=all-metrics");
+      const response = await fetch("data/benchmark.json?v=mask-runtime");
       if (!response.ok) throw new Error(`Manifest request failed: ${response.status}`);
       benchmark = await response.json();
       renderStats();
