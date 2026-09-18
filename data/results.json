@@ -5,7 +5,6 @@
     "aggregation": "pair mean -> video mean -> macro mean across videos",
     "metricScope": "Dataset ground-truth pixel mask region only, using pixel-accurate NPZ mask_packed.",
     "maskPsnrPolicy": "Mask PSNR retains infinity for zero-MSE videos; finite_mean and infinite_videos are reported for comparison.",
-    "speedPolicy": "Ours uses a deterministic 128-case timing sample at 768s with one warmup per GPU and logged 4-step SEdit diffusion only (excludes OCR, Qwen, model initialization, video I/O, paste-back, and encoding). CLEAR/MiniMax/DiffuEraser use single-GPU per-video wall time excluding one-time model initialization. The official ProPainter launcher initializes models per clip, so its wall time includes that overhead.",
     "baselinePostprocess": "Quality metrics use pixel-accurate NPZ masks. CLEAR remains mask-free; ProPainter, MiniMax-Remover, and DiffuEraser use the completed comparison outputs; LingBot-40K is labeled Ours.",
     "spatialMetrics": {
       "mask_source": "pixel-accurate NPZ mask_packed",
@@ -23,7 +22,6 @@
       "Mask_TWE": "Same forward-flow remap convention as othermethods/CLEAR/eval/compute_metrics.py; only error aggregation is mask-restricted",
       "aggregation": "pair mean -> video mean -> macro mean across videos"
     },
-    "speedProtocol": "Ours uses a deterministic 128-case timing sample with one warmup per GPU and logged 4-step SEdit pure inference only (excludes OCR, Qwen, I/O, paste-back, and encoding). CLEAR/MiniMax/DiffuEraser use single-GPU per-video wall time excluding one-time model initialization. The official ProPainter launcher initializes models per clip, so its wall time includes that overhead.",
     "selectedCounts": {
       "standard_subtitle": 232,
       "artistic_title": 218,
@@ -169,12 +167,6 @@
           "mask_flow_mean": 0.1117463983226891,
           "mask_flow_var": 0.013932868288529925
         }
-      },
-      "speed": {
-        "setting": "768s + 4-step SEdit",
-        "samples": 128,
-        "seconds_per_frame": 1.4695146443514642,
-        "throughput_fps": 0.6804967911301942
       }
     },
     {
@@ -310,12 +302,6 @@
           "mask_flow_mean": 0.18931527771808881,
           "mask_flow_var": 0.043448900229883174
         }
-      },
-      "speed": {
-        "setting": "Official inference",
-        "samples": 1631,
-        "seconds_per_frame": 1.3778394312798665,
-        "throughput_fps": 0.7257739743092605
       }
     },
     {
@@ -451,12 +437,6 @@
           "mask_flow_mean": 0.17232177544732263,
           "mask_flow_var": 0.03274009150638707
         }
-      },
-      "speed": {
-        "setting": "Official inference",
-        "samples": 1631,
-        "seconds_per_frame": 0.6611981507752235,
-        "throughput_fps": 1.5124059237424476
       }
     },
     {
@@ -592,12 +572,6 @@
           "mask_flow_mean": 0.20246947702045867,
           "mask_flow_var": 0.07299552110161045
         }
-      },
-      "speed": {
-        "setting": "Official inference",
-        "samples": 1631,
-        "seconds_per_frame": 0.47951957179089105,
-        "throughput_fps": 2.0854206143562375
       }
     },
     {
@@ -733,12 +707,6 @@
           "mask_flow_mean": 0.19643209838702655,
           "mask_flow_var": 0.03288703008887997
         }
-      },
-      "speed": {
-        "setting": "Official inference",
-        "samples": 1631,
-        "seconds_per_frame": 2.9537364156930392,
-        "throughput_fps": 0.33855424427415226
       }
     }
   ]

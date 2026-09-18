@@ -174,23 +174,6 @@
       </tr>
     `).join("");
   };
-  const renderSpeedTable = (methods) => {
-    const fastestSeconds = Math.min(...methods.map((method) => method.speed.seconds_per_frame));
-    const fastestFps = Math.max(...methods.map((method) => method.speed.throughput_fps));
-    document.querySelector("[data-results-speed]").innerHTML = methods.map((method) => `
-      <tr class="${method.id === "ours" ? "is-ours" : ""}">
-        <td class="${method.id === "ours" ? "result-method" : ""}" title="${method.speed.setting}">${method.label}</td>
-        <td>${method.speed.setting}</td>
-        <td>${formatNumber(method.speed.samples)}</td>
-        <td class="${method.speed.seconds_per_frame === fastestSeconds ? "result-best" : ""}">
-          ${formatMetric(method.speed.seconds_per_frame, 3)}
-        </td>
-        <td class="${method.speed.throughput_fps === fastestFps ? "result-best" : ""}">
-          ${formatMetric(method.speed.throughput_fps, 3)}
-        </td>
-      </tr>
-    `).join("");
-  };
   const updateResultTables = () => {
     const methods = benchmark.results.methods;
     const overallRecords = methods.map((method) => ({
@@ -223,7 +206,6 @@
       resultType = typeSelect.value;
       updateResultTables();
     });
-    renderSpeedTable(methods);
     updateResultTables();
   };
 
@@ -464,7 +446,7 @@
 
   const initialize = async () => {
     try {
-      const response = await fetch("data/benchmark.json?v=mask-clear-v1");
+      const response = await fetch("data/benchmark.json?v=mask-metrics-v2");
       if (!response.ok) throw new Error(`Manifest request failed: ${response.status}`);
       benchmark = await response.json();
       renderStats();

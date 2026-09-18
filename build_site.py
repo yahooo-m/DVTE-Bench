@@ -18,7 +18,6 @@ SITE_DIR = Path(__file__).resolve().parent
 BENCHMARK_DIR = SITE_DIR.parent
 PROJECT_DIR = BENCHMARK_DIR.parent.parent
 COMPARISON_DIR = PROJECT_DIR / "Bnechmark_test" / "othermethods_compare_1631"
-COMPARISON_SUMMARY_JSON = COMPARISON_DIR / "comparison_summary.json"
 MASK_CLEAR_METRICS_JSON = COMPARISON_DIR / "mask_clear_metrics.json"
 COMPARISON_STATUS_JSON = COMPARISON_DIR / "pipeline_status.json"
 COMPARISON_MANIFEST_CSV = COMPARISON_DIR / "manifest.csv"
@@ -151,21 +150,6 @@ RESULT_FIELDS = (
     "mask_flow_mean",
     "mask_flow_var",
 )
-
-SPEED_FIELDS = (
-    "runtime_setting",
-    "speed_samples",
-    "seconds_per_frame",
-    "throughput_fps",
-)
-
-RUNTIME_SETTINGS = {
-    "LingBot-40K": "768s + 4-step SEdit",
-    "CLEAR": "Official inference",
-    "ProPainter": "Official inference",
-    "MiniMax-Remover": "Official inference",
-    "DiffuEraser": "Official inference",
-}
 
 METHODS = {
     "LingBot-40K": {
@@ -349,7 +333,9 @@ def finite_or_none(value: object) -> float | None:
     return number if math.isfinite(number) else None
 
 
-def normalize_metrics(row: dict[str, object], include_vfid: bool = False) -> dict[str, object]:
+def normalize_metrics(
+    row: dict[str, object], include_vfid: bool = False
+) -> dict[str, object]:
     metrics = {
         "samples": int(row["Videos"]),
         "mask_psnr": finite_or_none(row.get("Mask_PSNR_finite_mean")),
@@ -371,7 +357,6 @@ def normalize_metrics(row: dict[str, object], include_vfid: bool = False) -> dic
 
 def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
     required = (
-        COMPARISON_SUMMARY_JSON,
         MASK_CLEAR_METRICS_JSON,
         COMPARISON_STATUS_JSON,
         COMPARISON_MANIFEST_CSV,
@@ -392,12 +377,10 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
     if len(comparison_rows) != 1631 or comparison_names != dataset_names:
         raise ValueError("Full comparison manifest does not match DVTE-Bench")
 
-    speed_source = json.loads(COMPARISON_SUMMARY_JSON.read_text(encoding="utf-8"))
-    quality_source = json.loads(MASK_CLEAR_METRICS_JSON.read_text(encoding="utf-8"))
-    summary_by_method = {row["Method"]: row for row in speed_source["summary"]}
-    quality_by_method = quality_source["methods"]
-    if set(summary_by_method) != set(METHODS) or set(quality_by_method) != set(METHODS):
-        raise ValueError("Comparison metric method coverage is incomplete")
+    source = json.loads(MASK_CLEAR_METRICS_JSON.read_text(encoding="utf-8"))
+    quality_by_method = source["methods"]
+    if set(quality_by_method) != set(METHODS):
+        raise ValueError("Mask metric method coverage is incomplete")
 
     selected_counts = dict(Counter(row["benchmark_type"] for row in dataset_rows))
     expected_counts = {category: selected_counts[category] for category in CATEGORY_ORDER}
@@ -418,71 +401,52 @@ def load_results(dataset_rows: list[dict[str, str]]) -> dict[str, object]:
             if int(temporal_by_type[category]["Videos"]) != expected_count:
                 raise ValueError(f"Unexpected {category} temporal coverage for {source_name}")
 
-        all_metrics = normalize_metrics(quality["summary"], include_vfid=True)
         methods.append(
             {
                 **metadata,
                 "coverage": 1631,
-                "overall": all_metrics,
+                "overall": normalize_metrics(
+                    quality["summary"], include_vfid=True
+                ),
                 "byType": {
                     category: normalize_metrics(
                         {**spatial_by_type[category], **temporal_by_type[category]}
                     )
                     for category in CATEGORY_ORDER
                 },
-                "speed": {
-                    "setting": RUNTIME_SETTINGS[source_name],
-                    "samples": int(summary_by_method[source_name]["Speed_videos"]),
-                    "seconds_per_frame": finite_or_none(
-                        summary_by_method[source_name]["Seconds_per_frame"]
-                    ),
-                    "throughput_fps": finite_or_none(
-                        summary_by_method[source_name]["Throughput_FPS"]
-                    ),
-                },
             }
         )
 
-    speed_protocol = speed_source["protocol"]
-    quality_protocol = quality_source["protocol"]
+    source_protocol = source["protocol"]
     return {
         "protocol": {
             "samples": 1631,
             "selection": "Complete evaluation on all 1,631 DVTE-Bench videos.",
-            "aggregation": quality_protocol["temporal"]["aggregation"],
+            "aggregation": source_protocol["temporal"]["aggregation"],
             "metricScope": (
                 "Dataset ground-truth pixel mask region only, using "
-                f"{quality_protocol['spatial']['mask_source']}."
+                f"{source_protocol['spatial']['mask_source']}."
             ),
             "maskPsnrPolicy": (
                 "Mask PSNR retains infinity for zero-MSE videos; finite_mean "
                 "and infinite_videos are reported for comparison."
-            ),
-            "speedPolicy": (
-                "Ours uses a deterministic 128-case timing sample at 768s with "
-                "one warmup per GPU and logged 4-step SEdit diffusion only "
-                "(excludes OCR, Qwen, model initialization, video I/O, "
-                "paste-back, and encoding). CLEAR/MiniMax/DiffuEraser use "
-                "single-GPU per-video wall time excluding one-time model "
-                "initialization. The official ProPainter launcher initializes "
-                "models per clip, so its wall time includes that overhead."
             ),
             "baselinePostprocess": (
                 "Quality metrics use pixel-accurate NPZ masks. CLEAR remains "
                 "mask-free; ProPainter, MiniMax-Remover, and DiffuEraser use "
                 "the completed comparison outputs; LingBot-40K is labeled Ours."
             ),
-            "spatialMetrics": quality_protocol["spatial"],
+            "spatialMetrics": source_protocol["spatial"],
             "temporalMetrics": {
                 key: value
-                for key, value in quality_protocol["temporal"].items()
+                for key, value in source_protocol["temporal"].items()
                 if key != "manifest"
             },
-            "speedProtocol": speed_protocol["speed"].replace("LingBot", "Ours"),
             "selectedCounts": expected_counts,
         },
         "methods": methods,
     }
+
 
 def write_results_csv(results: dict[str, object]) -> None:
     fields = [
@@ -490,21 +454,11 @@ def write_results_csv(results: dict[str, object]) -> None:
         "scope",
         "samples",
         *RESULT_FIELDS,
-        *SPEED_FIELDS,
     ]
     rows: list[dict[str, object]] = []
     for method in results["methods"]:
-        speed = method["speed"]
         rows.append(
-            {
-                "method": method["label"],
-                "scope": "overall",
-                **method["overall"],
-                "runtime_setting": speed["setting"],
-                "speed_samples": speed["samples"],
-                "seconds_per_frame": speed["seconds_per_frame"],
-                "throughput_fps": speed["throughput_fps"],
-            }
+            {"method": method["label"], "scope": "overall", **method["overall"]}
         )
         for category, metrics in method["byType"].items():
             rows.append({"method": method["label"], "scope": category, **metrics})

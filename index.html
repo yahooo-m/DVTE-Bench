@@ -6,9 +6,9 @@
   <meta name="description" content="DVTE-Bench (Diverse Video Text Erasure Benchmark) provides 1,631 paired clips across 8 text types for video text erasure evaluation.">
   <meta name="theme-color" content="#f4f6f8">
   <title>DVTE-Bench | Diverse Video Text Erasure Benchmark</title>
-  <link rel="stylesheet" href="styles.css?v=mask-clear-v1">
+  <link rel="stylesheet" href="styles.css?v=mask-metrics-v2">
   <script src="assets/vendor/lucide.min.js" defer></script>
-  <script src="app.js?v=mask-clear-v1" defer></script>
+  <script src="app.js?v=mask-metrics-v2" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -183,34 +183,8 @@
         </div>
         <p class="results-note reveal" data-results-note>
           † Finite Mask PSNR mean; zero-MSE videos are excluded only from that column.
-          Quality metrics use pixel-accurate dataset ground-truth masks; Mask VFID is
-          reported for the full benchmark and omitted from per-type breakdowns.
-        </p>
-        <div class="results-subhead speed-results-head reveal">
-          <div>
-            <h3>Runtime</h3>
-            <p>Reported single-GPU timing samples; coverage is shown per method.</p>
-          </div>
-        </div>
-        <div class="table-wrap results-table speed-results reveal">
-          <table>
-            <thead>
-              <tr>
-                <th>Method</th>
-                <th>Setting</th>
-                <th>Timed videos</th>
-                <th>Seconds / frame ↓</th>
-                <th>Throughput FPS ↑</th>
-              </tr>
-            </thead>
-            <tbody data-results-speed></tbody>
-          </table>
-        </div>
-        <p class="results-note reveal">
-          Ours reports 768s, 4-step SEdit diffusion on a deterministic 128-video sample,
-          excluding OCR, Qwen, model initialization, video I/O, paste-back, and encoding.
-          Baseline timings exclude one-time initialization, except ProPainter's official
-          per-clip launcher.
+          All quality metrics use pixel-accurate masks. Mask VFID is a global
+          full-benchmark metric and is omitted from per-type breakdowns.
         </p>
       </div>
     </section>
@@ -316,7 +290,7 @@
         <div class="section-heading reveal">
           <p class="eyebrow">Protocol</p>
           <h2 id="protocol-title">A reproducible evaluation contract</h2>
-          <p>Evaluate every clip consistently against its paired clean reference and ground-truth mask.</p>
+          <p>Evaluate every clip consistently against its paired clean reference and pixel-accurate mask.</p>
         </div>
         <div class="protocol-grid reveal">
           <article>
@@ -327,12 +301,12 @@
           <article>
             <span>02</span>
             <h3>Report mask region</h3>
-            <p>Measure Mask PSNR, SSIM, LPIPS, DISTS, VFID, TWE, TC, and flow statistics inside the provided ground-truth masks.</p>
+            <p>Measure Mask PSNR, SSIM, LPIPS, DISTS, VFID, TWE, TC, and flow statistics.</p>
           </article>
           <article>
             <span>03</span>
-            <h3>Disclose runtime setup</h3>
-            <p>Report resolution, denoising steps, timed scope, sample count, and throughput with every speed result.</p>
+            <h3>Evaluate all clips</h3>
+            <p>Compute the primary leaderboard over the complete set of 1,631 benchmark videos.</p>
           </article>
           <article>
             <span>04</span>
