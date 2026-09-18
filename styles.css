@@ -324,7 +324,7 @@ h1, h2, h3, p, figure, dl, dd, pre { margin: 0; }
   font-size: 12px;
 }
 .results-table { margin-top: 0; }
-.results-table table { min-width: 850px; }
+.results-table table { min-width: 1500px; }
 .results-table th:not(:first-child),
 .results-table td:not(:first-child) { text-align: right; }
 .results-table td { font-variant-numeric: tabular-nums; }

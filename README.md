@@ -9,15 +9,15 @@ Project page: <https://yahooo-m.github.io/DVTE-Bench/>
 ## Results
 
 Ours and four public baselines were evaluated on all 1,631 videos. Quality
-results are reported only inside the dataset ground-truth masks.
+results are reported only inside pixel-accurate dataset ground-truth masks.
 
-| Method | Mask PSNR | Mask MAE | Mask MSE | Crop-SSIM |
-| --- | ---: | ---: | ---: | ---: |
-| Ours | **31.348** | **5.449** | **131.153** | **0.9053** |
-| CLEAR | 16.880 | 33.470 | 2893.994 | 0.6193 |
-| ProPainter | 26.152 | 11.084 | 598.561 | 0.8246 |
-| MiniMax-Remover | 26.295 | 10.105 | 444.954 | 0.8399 |
-| DiffuEraser | 24.963 | 11.923 | 553.245 | 0.8129 |
+| Method | Mask PSNR | Mask SSIM | Mask LPIPS | Mask DISTS | Mask VFID | TWE Pred | TWE GT | TWE Gap | TC | Flow Mean | Flow Var |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Ours | **30.799** | **0.8822** | **0.0408** | **0.0507** | **0.0835** | 9.31 | 9.32 | **0.01** | 4.25 | **0.333** | **0.592** |
+| CLEAR | 16.025 | 0.5172 | 0.3209 | 0.2158 | 1.4736 | 10.24 | 9.32 | 0.91 | 11.03 | 0.901 | 2.817 |
+| ProPainter | 25.900 | 0.7832 | 0.1166 | 0.0957 | 0.3879 | **8.14** | 9.32 | 1.18 | **4.03** | 0.650 | 1.560 |
+| MiniMax-Remover | 26.167 | 0.8044 | 0.0977 | 0.0856 | 0.2806 | 8.71 | 9.32 | 0.61 | 4.56 | 0.799 | 2.307 |
+| DiffuEraser | 24.843 | 0.7723 | 0.1130 | 0.0952 | 0.3285 | 10.19 | 9.32 | 0.86 | 5.32 | 0.669 | 1.938 |
 
 | Method | Runtime setting | Timed videos | Seconds / frame | FPS |
 | --- | --- | ---: | ---: | ---: |
@@ -28,8 +28,9 @@ results are reported only inside the dataset ground-truth masks.
 | DiffuEraser | Official inference | 1,631 | 2.954 | 0.339 |
 
 The project page reports one full-benchmark leaderboard over all 1,631 videos,
-plus per-type mask-region breakdowns and runtime. Ours runtime measures 768s,
-4-step SEdit diffusion only. Download the machine-readable table from
+plus per-type pixel-mask breakdowns and runtime. Mask VFID is full-benchmark
+only. Ours runtime measures 768s, 4-step SEdit diffusion only. Download the
+machine-readable table from
 [`data/results.csv`](data/results.csv).
 
 ## Local preview
@@ -55,8 +56,8 @@ Use `--force` to regenerate existing preview media. The builder:
 - selects two representative samples per type;
 - creates aligned Source, Target, and Mask previews;
 - generates separate posters for all three preview streams.
-- validates the completed full-benchmark evaluation and exports mask-region,
-  runtime, and per-type metrics for all methods;
+- validates the completed full-benchmark evaluation and exports pixel-mask
+  quality metrics, runtime, and per-type metrics for all methods;
 - aggregates all 1,631 videos into one primary leaderboard.
 
 The website package is intentionally small. It exposes the complete searchable

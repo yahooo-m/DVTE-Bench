@@ -119,45 +119,54 @@
       `).join("");
   };
 
-  const RESULT_METRICS = [
+  const OVERALL_RESULT_METRICS = [
     { field: "mask_psnr", label: "Mask PSNR† ↑", digits: 2, direction: "max", infiniteField: "mask_psnr_infinite_samples" },
-    { field: "mask_mae", label: "Mask MAE ↓", digits: 2, direction: "min" },
-    { field: "mask_mse", label: "Mask MSE ↓", digits: 2, direction: "min" },
-    { field: "mask_crop_ssim", label: "Crop-SSIM ↑", digits: 4, direction: "max" },
+    { field: "mask_ssim", label: "Mask SSIM ↑", digits: 4, direction: "max" },
+    { field: "mask_lpips", label: "Mask LPIPS ↓", digits: 4, direction: "min" },
+    { field: "mask_dists", label: "Mask DISTS ↓", digits: 4, direction: "min" },
+    { field: "mask_vfid", label: "Mask VFID ↓", digits: 4, direction: "min" },
+    { field: "mask_twe_pred", label: "TWE Pred ↓", digits: 2, direction: "min" },
+    { field: "mask_twe_gt", label: "TWE GT", digits: 2 },
+    { field: "mask_twe_gap", label: "TWE Gap ↓", digits: 2, direction: "min" },
+    { field: "mask_tc", label: "TC ↓", digits: 2, direction: "min" },
+    { field: "mask_flow_mean", label: "Flow Mean ↓", digits: 3, direction: "min" },
+    { field: "mask_flow_var", label: "Flow Var ↓", digits: 3, direction: "min" },
   ];
+  const BY_TYPE_RESULT_METRICS = OVERALL_RESULT_METRICS
+    .filter((metric) => metric.field !== "mask_vfid");
   const formatMetric = (value, digits) => (
     value === null || !Number.isFinite(value) ? "n/a" : Number(value).toFixed(digits)
   );
   const formatResultMetric = (metrics, definition) => {
     const value = formatMetric(metrics[definition.field], definition.digits);
     if (!definition.infiniteField) return value;
-    const infinite = metrics[definition.infiniteField];
-    const suffix = infinite ? "†" : "";
+    const infinite = Number(metrics[definition.infiniteField] || 0);
+    const suffix = infinite > 0 ? "†" : "";
     return `<span title="${infinite} infinite Mask PSNR video${infinite === 1 ? "" : "s"}">${value}${suffix}</span>`;
   };
   const bestValue = (records, definition) => {
     if (!definition.direction) return null;
     const values = records
-      .map((record) => record.metrics[definition.field])
+      .map((record) => record.metrics && record.metrics[definition.field])
       .filter((value) => Number.isFinite(value));
     return values.length ? Math[definition.direction](...values) : null;
   };
-  const renderResultHeader = (target) => {
+  const renderResultHeader = (target, metricDefinitions) => {
     target.innerHTML = `
       <th>Method</th>
       <th>Videos</th>
-      ${RESULT_METRICS.map((metric) => `<th>${metric.label}</th>`).join("")}
+      ${metricDefinitions.map((metric) => `<th>${metric.label}</th>`).join("")}
     `;
   };
-  const renderResultTable = (target, records) => {
+  const renderResultTable = (target, records, metricDefinitions) => {
     const best = Object.fromEntries(
-      RESULT_METRICS.map((definition) => [definition.field, bestValue(records, definition)])
+      metricDefinitions.map((definition) => [definition.field, bestValue(records, definition)])
     );
     target.innerHTML = records.map(({ method, metrics }) => `
       <tr class="${method.id === "ours" ? "is-ours" : ""}">
         <td class="${method.id === "ours" ? "result-method" : ""}" title="${method.configuration}">${method.label}</td>
         <td>${formatNumber(metrics.samples)}</td>
-        ${RESULT_METRICS.map((definition) => {
+        ${metricDefinitions.map((definition) => {
           const value = metrics[definition.field];
           const isBest = best[definition.field] !== null && value === best[definition.field];
           return `<td class="${isBest ? "result-best" : ""}">${formatResultMetric(metrics, definition)}</td>`;
@@ -192,15 +201,15 @@
       method,
       metrics: method.byType[resultType],
     }));
-    renderResultHeader(document.querySelector("[data-results-overall-head]"));
-    renderResultHeader(document.querySelector("[data-results-type-head]"));
-    renderResultTable(document.querySelector("[data-results-overall]"), overallRecords);
-    renderResultTable(document.querySelector("[data-results-by-type]"), typeRecords);
+    renderResultHeader(document.querySelector("[data-results-overall-head]"), OVERALL_RESULT_METRICS);
+    renderResultHeader(document.querySelector("[data-results-type-head]"), BY_TYPE_RESULT_METRICS);
+    renderResultTable(document.querySelector("[data-results-overall]"), overallRecords, OVERALL_RESULT_METRICS);
+    renderResultTable(document.querySelector("[data-results-by-type]"), typeRecords, BY_TYPE_RESULT_METRICS);
     const category = benchmark.categories.find((item) => item.id === resultType);
     document.querySelector("[data-result-configuration]").textContent =
-      `${methods.length} completed methods · ${formatNumber(methods[0].overall.samples)} videos · mask region`;
+      `${methods.length} completed methods · ${formatNumber(methods[0].overall.samples)} videos · pixel mask region`;
     document.querySelector("[data-breakdown-description]").textContent =
-      `${category.label} · ${formatNumber(typeRecords[0].metrics.samples)} videos · mask region`;
+      `${category.label} · ${formatNumber(typeRecords[0].metrics.samples)} videos · pixel mask region`;
   };
   const renderResults = () => {
     const methods = benchmark.results.methods;
@@ -455,7 +464,7 @@
 
   const initialize = async () => {
     try {
-      const response = await fetch("data/benchmark.json?v=mask-runtime");
+      const response = await fetch("data/benchmark.json?v=mask-clear-v1");
       if (!response.ok) throw new Error(`Manifest request failed: ${response.status}`);
       benchmark = await response.json();
       renderStats();

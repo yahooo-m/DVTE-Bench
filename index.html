@@ -6,9 +6,9 @@
   <meta name="description" content="DVTE-Bench (Diverse Video Text Erasure Benchmark) provides 1,631 paired clips across 8 text types for video text erasure evaluation.">
   <meta name="theme-color" content="#f4f6f8">
   <title>DVTE-Bench | Diverse Video Text Erasure Benchmark</title>
-  <link rel="stylesheet" href="styles.css?v=mask-runtime">
+  <link rel="stylesheet" href="styles.css?v=mask-clear-v1">
   <script src="assets/vendor/lucide.min.js" defer></script>
-  <script src="app.js?v=mask-runtime" defer></script>
+  <script src="app.js?v=mask-clear-v1" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -139,14 +139,14 @@
         <div class="section-heading reveal">
           <p class="eyebrow">Benchmark Results</p>
           <h2 id="results-title">Mask-region leaderboard</h2>
-          <p>Five methods evaluated on all 1,631 clips inside the dataset ground-truth masks.</p>
+          <p>Five methods evaluated on all 1,631 clips inside pixel-accurate dataset ground-truth masks.</p>
         </div>
         <div class="results-toolbar reveal">
           <div class="method-identity">
             <span class="method-badge">5 methods</span>
             <div>
               <strong>Complete evaluation</strong>
-              <span data-result-configuration>5 completed methods · 1,631 videos · mask region</span>
+              <span data-result-configuration>5 completed methods · 1,631 videos · pixel mask region</span>
             </div>
           </div>
           <div class="results-actions">
@@ -166,7 +166,7 @@
         <div class="results-subhead reveal">
           <div>
             <h3>Breakdown by text type</h3>
-            <p data-breakdown-description>Standard Subtitle · 232 videos · mask region</p>
+            <p data-breakdown-description>Standard Subtitle · 232 videos · pixel mask region</p>
           </div>
           <label class="result-select">
             <span>Text type</span>
@@ -183,7 +183,8 @@
         </div>
         <p class="results-note reveal" data-results-note>
           † Finite Mask PSNR mean; zero-MSE videos are excluded only from that column.
-          All displayed quality metrics use dataset ground-truth masks.
+          Quality metrics use pixel-accurate dataset ground-truth masks; Mask VFID is
+          reported for the full benchmark and omitted from per-type breakdowns.
         </p>
         <div class="results-subhead speed-results-head reveal">
           <div>
@@ -326,7 +327,7 @@
           <article>
             <span>02</span>
             <h3>Report mask region</h3>
-            <p>Measure Mask PSNR, MAE, MSE, and Crop-SSIM inside the provided ground-truth masks.</p>
+            <p>Measure Mask PSNR, SSIM, LPIPS, DISTS, VFID, TWE, TC, and flow statistics inside the provided ground-truth masks.</p>
           </article>
           <article>
             <span>03</span>
