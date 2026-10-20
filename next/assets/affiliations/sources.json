@@ -1,0 +1,16 @@
+{
+  "verified_on": "2026-10-20",
+  "author_and_affiliation_source": "https://arxiv.org/html/2610.26081v1",
+  "assets": [
+    {
+      "file": "bytedance-logo.svg",
+      "source_page": "https://www.bytedance.com/en/",
+      "source_asset": "Official site header, embedded SVG; preserved without modification"
+    },
+    {
+      "file": "sustech-logo.png",
+      "source_page": "https://www.sustech.edu.cn/en/",
+      "source_asset": "https://www.sustech.edu.cn/static/images/sustech-logo-en.png"
+    }
+  ]
+}

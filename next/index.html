@@ -3,11 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="DVTE-Bench: 1,631 paired videos, eight text challenges, and a closer look at video text erasure. Explore aligned data, real model outputs, and full benchmark results.">
+  <meta name="description" content="DeOverlay and DVTE-Bench, a video overlay removal research project from ByteDance and Southern University of Science and Technology. Explore 1,631 paired videos, real model outputs, and full benchmark results.">
   <meta name="theme-color" content="#fff8ec">
-  <title>DVTE-Bench — Every text. Every frame.</title>
+  <meta name="citation_title" content="DeOverlay: A Benchmark and Source-Anchored Flow for Video Overlay Removal">
+  <meta name="citation_author" content="Deshui Miao">
+  <meta name="citation_author" content="Yuhang Ma">
+  <meta name="citation_author" content="Shaoyong Jia">
+  <meta name="citation_author" content="Wenzhao Gao">
+  <meta name="citation_author" content="Yue Zhang">
+  <meta name="citation_author" content="Shaohui Jiao">
+  <meta name="citation_author" content="Xin Li">
+  <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2610.26081">
+  <title>DeOverlay &amp; DVTE-Bench — Every text. Every frame.</title>
   <link rel="stylesheet" href="assets/fonts/fonts.css">
   <link rel="stylesheet" href="style.css?v=20261020">
+  <link rel="stylesheet" href="authorship.css?v=20261020">
   <link rel="stylesheet" href="results.css?v=20261020">
   <script src="app.js?v=20261020" defer></script>
   <script src="results.js?v=20261020" defer></script>
@@ -28,7 +38,28 @@
       <div class="hero-copy">
         <p class="eyebrow">DIVERSE VIDEO TEXT ERASURE BENCHMARK</p>
         <h1>Erase the <span class="text-word">text.</span><br>Keep the <span class="story-word">story.</span></h1>
-        <p class="hero-subtitle">DVTE-Bench</p>
+        <p class="hero-subtitle">DeOverlay <span>+ DVTE-Bench</span></p>
+        <div class="research-credits" aria-label="Authors and affiliations">
+          <ul class="author-list" aria-label="Authors in paper order">
+            <li>Deshui Miao<sup>1</sup></li>
+            <li>Yuhang Ma<sup>1</sup></li>
+            <li>Shaoyong Jia<sup>1</sup></li>
+            <li>Wenzhao Gao<sup>1</sup></li>
+            <li>Yue Zhang<sup>1</sup></li>
+            <li>Shaohui Jiao<sup>1</sup></li>
+            <li>Xin Li<sup>2</sup></li>
+          </ul>
+          <p class="affiliation-labels"><span><sup>1</sup> ByteDance · 字节跳动</span><span><sup>2</sup> Southern University of Science and Technology</span></p>
+          <div class="affiliation-logos" aria-label="Research institutions">
+            <a class="affiliation-logo" href="https://www.bytedance.com/en/" target="_blank" rel="noopener noreferrer" aria-label="ByteDance (字节跳动), institution 1">
+              <img src="assets/affiliations/bytedance-logo.svg" width="256" height="44" alt="ByteDance">
+            </a>
+            <a class="affiliation-logo" href="https://www.sustech.edu.cn/en/" target="_blank" rel="noopener noreferrer" aria-label="Southern University of Science and Technology, institution 2">
+              <img src="assets/affiliations/sustech-logo.png" width="433" height="86" alt="SUSTech — Southern University of Science and Technology">
+            </a>
+          </div>
+          <div class="research-links" aria-label="Research resources"><a href="https://arxiv.org/abs/2610.26081" target="_blank" rel="noopener noreferrer">Read the paper <span aria-hidden="true">↗</span></a><a href="https://huggingface.co/papers/2610.26081" target="_blank" rel="noopener noreferrer">HF Daily Papers <span aria-hidden="true">↗</span></a></div>
+        </div>
         <p class="hero-description">A closer look at video text erasure. Eight kinds of text, paired clean references, and frame-aligned masks reveal what happens beyond ordinary subtitles.</p>
         <div class="hero-actions"><a class="button primary" href="#explorer">Explore the videos <span aria-hidden="true">↗</span></a><a class="button" href="#results">See the results <span aria-hidden="true">↓</span></a></div>
         <div class="hero-tags"><span>Paired videos</span><span>Pixel masks</span><span>11 language labels</span></div>
@@ -99,7 +130,7 @@
       </div>
     </section>
   </main>
-  <footer class="footer shell"><a class="brand" href="#overview">DVTE<span class="brand-accent">-Bench</span></a><p>Diverse Video Text Erasure Benchmark</p><div><a href="../original.html">Original page ↗</a><a href="#overview">Back to top ↑</a></div></footer>
+  <footer class="footer shell"><a class="brand" href="#overview">DVTE<span class="brand-accent">-Bench</span></a><p>DeOverlay &amp; DVTE-Bench · ByteDance + SUSTech</p><div><a href="../original.html">Original page ↗</a><a href="#overview">Back to top ↑</a></div></footer>
   <noscript><div class="noscript">This interactive page needs JavaScript. <a href="../original.html">Open the original page</a> or <a href="../data/results.csv">download the results CSV</a>.</div></noscript>
 </body>
 </html>

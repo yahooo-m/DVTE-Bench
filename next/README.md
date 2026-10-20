@@ -31,3 +31,7 @@ The benchmark contains 1,563 synthetic-overlay clips and 68 seen ASR regression 
 ## Fonts and assets
 
 Fredoka, Nunito, and JetBrains Mono are self-hosted in `assets/fonts/`, with their OFL license files. All demonstration media are original benchmark previews or CPU encodes of the real saved predictions. No generated or manually repaired result imagery is used.
+
+## Authors and institutions
+
+The hero credits all seven authors in the order and with the affiliation numbers of the [DeOverlay paper](https://arxiv.org/html/2610.26081v1): Deshui Miao, Yuhang Ma, Shaoyong Jia, Wenzhao Gao, Yue Zhang, and Shaohui Jiao at ByteDance; Xin Li at Southern University of Science and Technology. Institution marks are unmodified assets from the official ByteDance and SUSTech websites, served locally. `assets/affiliations/sources.json` records their provenance. The hero also links to the paper and its Hugging Face Daily Papers page.
