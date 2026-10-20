@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="DVTE-Bench: 1,631 paired videos, eight text challenges, and a closer look at video text erasure. Explore aligned data, real model outputs, and full benchmark results.">
+  <meta name="theme-color" content="#fff8ec">
+  <title>DVTE-Bench — Every text. Every frame.</title>
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
+  <link rel="stylesheet" href="style.css?v=20261020">
+  <link rel="stylesheet" href="results.css?v=20261020">
+  <script src="app.js?v=20261020" defer></script>
+  <script src="results.js?v=20261020" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav shell" aria-label="Main navigation">
+      <a class="brand" href="#overview" aria-label="DVTE-Bench home"><span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 36 36" fill="none"><rect x="5" y="6" width="26" height="24" rx="5" stroke="currentColor" stroke-width="2"/><path d="M10 13h16M10 23h9m-3-10v10m3-5 7 7m-7 0 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span>DVTE<span class="brand-accent">-Bench</span></span></a>
+      <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-links">☰</button>
+      <div class="nav-links" id="nav-links"><a href="#overview">Overview</a><a href="#taxonomy">The 8 types</a><a href="#explorer">Explore</a><a href="#results">Results</a><a href="#protocol">Protocol</a></div>
+      <a class="repo-link" href="https://github.com/yahooo-m/DVTE-Bench" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+    <div class="reading-progress" aria-hidden="true"></div>
+  </header>
+  <main id="main">
+    <section class="hero section shell" id="overview">
+      <div class="hero-copy">
+        <p class="eyebrow">DIVERSE VIDEO TEXT ERASURE BENCHMARK</p>
+        <h1>Erase the <span class="text-word">text.</span><br>Keep the <span class="story-word">story.</span></h1>
+        <p class="hero-subtitle">DVTE-Bench</p>
+        <p class="hero-description">A closer look at video text erasure. Eight kinds of text, paired clean references, and frame-aligned masks reveal what happens beyond ordinary subtitles.</p>
+        <div class="hero-actions"><a class="button primary" href="#explorer">Explore the videos <span aria-hidden="true">↗</span></a><a class="button" href="#results">See the results <span aria-hidden="true">↓</span></a></div>
+        <div class="hero-tags"><span>Paired videos</span><span>Pixel masks</span><span>11 language labels</span></div>
+      </div>
+      <div class="hero-art">
+        <div class="window-top"><span><i class="status-dot"></i> A RECORDED MODEL COMPARISON</span><button id="hero-motion" type="button" aria-label="Pause hero animation">Ⅱ</button></div>
+        <div class="wipe-stage" id="hero-wipe">
+          <video id="hero-source" muted playsinline preload="metadata" poster="../assets/posters/case-11-source.jpg" aria-label="Source video with multiple text regions"><source src="../assets/videos/case-11-source.mp4" type="video/mp4"></video>
+          <video id="hero-output" class="wipe-output" muted playsinline preload="metadata" poster="assets/model-posters/case-11-ours.jpg" aria-label="Recorded Ours model output"><source src="assets/model-videos/case-11-ours.mp4" type="video/mp4"></video>
+          <span class="wipe-label reference-label">OURS · RECORDED OUTPUT</span><span class="wipe-label source-label">SOURCE</span>
+          <div class="wipe-divider" aria-hidden="true"><span>↔</span></div>
+          <input id="hero-compare" type="range" min="0" max="100" value="48" aria-label="Compare source with recorded Ours output" aria-valuetext="48 percent recorded Ours output">
+        </div>
+        <div class="hero-art-caption"><span class="mono">MULTI-REGION · GT BOX · 6 STEPS</span><span>Drag to reveal <span aria-hidden="true">↔</span></span></div>
+        <div class="hero-art-note"><span class="note-line" aria-hidden="true">↳</span> One scene. Every text region.</div>
+      </div>
+    </section>
+    <section class="stats shell" aria-label="Benchmark at a glance">
+      <div><strong>1,631<span> clips</span></strong><p>Paired source + reference</p></div><div><strong>8<span> types</span></strong><p>Layout, motion, typography</p></div><div><strong>136,090</strong><p>Frame-aligned video frames</p></div><div><strong>91.1<span> min</span></strong><p>Portrait + landscape video</p></div>
+    </section>
+    <section class="section blue-wash" id="taxonomy">
+      <div class="shell">
+        <div class="section-heading"><div><p class="eyebrow">01 / MORE THAN SUBTITLES</p><h2>Text takes many forms.<br><span>Test all eight.</span></h2></div><p>From moving captions to vertical writing, each slice brings a different challenge. Pick a card to inspect its paired benchmark examples.</p></div>
+        <div class="taxonomy-grid" id="taxonomy-grid" aria-label="Eight benchmark text types"></div>
+        <p class="section-footnote">Card previews show source clips with text overlays. Hover or focus to play; select to explore.</p>
+      </div>
+    </section>
+    <section class="section" id="explorer">
+      <div class="shell">
+        <div class="section-heading"><div><p class="eyebrow">02 / LOOK CLOSER</p><h2>A scene. A text layer.<br><span>Every frame matters.</span></h2></div><p>Compare the source with recorded model outputs, the paired clean reference, or the text mask. One timeline keeps the views aligned.</p></div>
+        <div class="filter-row" id="case-filters" role="group" aria-label="Filter video examples"></div>
+        <p id="load-status" role="status">Loading the benchmark…</p>
+        <div class="explorer-panel">
+          <aside class="case-sidebar"><div class="sidebar-label mono">RECORDED EXAMPLES <span id="case-count">16</span></div><div id="case-list" aria-label="Choose a video example"></div></aside>
+          <article class="case-player" aria-labelledby="case-title">
+            <div class="case-top mono"><span id="case-kicker">DVTE-BENCH / ALIGNED PREVIEW</span><span id="case-index">01 / 16</span></div>
+            <div class="case-heading"><div><h3 id="case-title">Inspect a paired scene</h3><p id="case-description">Select a case to compare its frames.</p></div><button class="button small" id="case-restart" type="button" aria-label="Replay this case">Replay ↻</button></div>
+            <div class="comparison-toolbar"><div class="view-tabs" role="group" aria-label="Right video view"><button type="button" data-view="prediction" aria-pressed="true">Model output</button><button type="button" data-view="reference" aria-pressed="false">Clean reference</button><button type="button" data-view="mask" aria-pressed="false">Text mask</button></div><label class="model-select">Method <select id="model-select" aria-label="Prediction method"></select></label></div>
+            <p class="comparison-note" id="comparison-note"></p>
+            <div class="comparison-pair" id="comparison-pair">
+              <figure><figcaption><span class="status-dot"></span> SOURCE <span>with text</span></figcaption><video id="source-video" playsinline muted preload="metadata" aria-label="Source video with text"></video><p class="media-error" id="source-error" hidden>Source could not be loaded.</p></figure>
+              <figure><figcaption><span class="status-dot teal-dot"></span> <strong id="output-label">MODEL OUTPUT</strong><span id="output-detail">recorded inference</span></figcaption><video id="output-video" playsinline muted preload="metadata" aria-label="Selected comparison video"></video><p class="media-error" id="output-error" hidden>Comparison could not be loaded.</p></figure>
+            </div>
+            <div class="transport"><button id="case-play" class="play-button" type="button" aria-label="Play synchronized preview">▶</button><span id="current-time" class="mono">0.0 s</span><input id="case-timeline" type="range" min="0" max="1000" value="0" aria-label="Preview position"><span id="case-duration" class="mono">0.0 s</span></div>
+            <div class="case-meta" id="case-meta"></div>
+            <details class="case-details"><summary>Sample details &amp; provenance <span aria-hidden="true">+</span></summary><div id="case-details-content"></div></details>
+          </article>
+        </div>
+        <p class="section-footnote">Recorded outputs are qualitative previews. The clean reference is paired benchmark data; it is not a model prediction. Metrics below use the full 1,631-video evaluation.</p>
+      </div>
+    </section>
+    <section class="section peach-wash" id="results">
+      <div class="shell"><div class="section-heading"><div><p class="eyebrow">03 / THE BENCHMARK</p><h2>Look at the pixels.<br><span>Then the numbers.</span></h2></div><p>Five methods, all 1,631 clips. Explore quality and temporal metrics inside the dataset’s pixel-accurate text regions.</p></div><div id="results-ui"></div></div>
+    </section>
+    <section class="section" id="protocol">
+      <div class="shell">
+        <div class="section-heading"><div><p class="eyebrow">04 / WHAT IS MEASURED</p><h2>Aligned data.<br><span>Explicit evaluation.</span></h2></div><p>Each source has a clean reference and a frame-level mask. Category breakdowns keep the different text challenges visible.</p></div>
+        <div class="protocol-grid"><article><span class="step-number">01</span><h3>Pair the frames.</h3><p>Source, clean reference, and text masks share frame alignment. Compare the same scene at the same time.</p></article><article><span class="step-number">02</span><h3>Inspect the text region.</h3><p>Quality metrics use dataset ground-truth pixel masks. Temporal metrics inspect the affected regions across frames.</p></article><article><span class="step-number">03</span><h3>Report every slice.</h3><p>All eight categories contribute to the full aggregate. Per-type results reveal where performance changes.</p></article></div>
+        <div class="protocol-notes"><p><strong>Clean-target audit.</strong> All target frames were scanned under one OCR configuration. 569 candidates with confirmed residual text were rejected before the final release.</p><p><strong>Dataset composition.</strong> 1,563 clips use synthetically overlaid text; 68 form the seen ASR regression track with known training overlap. The full 1,631-video aggregate and category results retain both tracks.</p><p id="inference-protocol"><strong>Inference settings.</strong> Ours uses a 40K checkpoint, 6 inference steps, GT bounding-box guidance, and seamless paste-back. ProPainter, MiniMax-Remover, and DiffuEraser use GT box masks with source paste-back; CLEAR is mask-free. Metrics use pixel-accurate GT masks. The qualitative outputs include each method’s saved postprocessing.</p></div>
+        <div class="composition"><div class="composition-chart"><p class="eyebrow">A CLOSER LOOK AT THE DATA</p><div id="composition-bars" aria-label="Clips per text type"></div></div><div class="composition-side"><div class="orientation-ring" role="img" aria-label="1,085 portrait clips, 66.5 percent; 546 landscape clips, 33.5 percent"><div><strong>66.5<span>%</span></strong><span>PORTRAIT</span></div></div><p><strong>1,085 portrait</strong> + 546 landscape clips</p><div class="language-label"><strong>11</strong><span>language labels<br>across the benchmark</span></div></div></div>
+      </div>
+    </section>
+    <section class="section blue-wash" id="data">
+      <div class="shell">
+        <div class="section-heading"><div><p class="eyebrow">05 / EXPLORE THE DATA</p><h2>Find your next<br><span>stress test.</span></h2></div><p>Browse all 1,631 records, inspect the metadata, or take the manifests into your own evaluation workflow.</p></div>
+        <details class="catalog" id="catalog"><summary><span>Search the complete benchmark <small>1,631 records · type, language, format</small></span><span aria-hidden="true">+</span></summary><div class="catalog-inner"><div class="catalog-controls"><label>Search records<input id="catalog-search" type="search" placeholder="Text, language, or sample ID"></label><label>Text type<select id="catalog-type" aria-label="Catalog text type"><option value="all">All types</option></select></label><label>Format<select id="catalog-orientation" aria-label="Catalog format"><option value="all">All formats</option><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label></div><p id="catalog-count" role="status"></p><div class="table-scroll" tabindex="0" role="region" aria-label="Searchable benchmark records"><table class="catalog-table"><thead><tr><th>Sample ID</th><th>Type</th><th>Language</th><th>Format</th><th>Duration</th><th>Regions</th></tr></thead><tbody id="catalog-body"></tbody></table></div><div class="pagination"><button class="button small" id="catalog-prev" type="button">← Previous</button><span id="catalog-page" class="mono"></span><button class="button small" id="catalog-next" type="button">Next →</button></div></div></details>
+        <div class="download-panel"><div><span class="tag">DVTE-BENCH / PAIRED DATA</span><h3>Source. Reference. Mask.<br>Ready to inspect.</h3><p>Download the complete metadata or explore the source repository.</p></div><div class="download-actions"><a class="button primary" href="../data/benchmark_manifest.csv" download>Download manifest <span aria-hidden="true">↓</span></a><a class="button" href="https://github.com/yahooo-m/DVTE-Bench" target="_blank" rel="noopener noreferrer">View repository <span aria-hidden="true">↗</span></a><a class="text-link" href="../data/benchmark.json" download>Web manifest JSON ↗</a></div></div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer shell"><a class="brand" href="#overview">DVTE<span class="brand-accent">-Bench</span></a><p>Diverse Video Text Erasure Benchmark</p><div><a href="../original.html">Original page ↗</a><a href="#overview">Back to top ↑</a></div></footer>
+  <noscript><div class="noscript">This interactive page needs JavaScript. <a href="../original.html">Open the original page</a> or <a href="../data/results.csv">download the results CSV</a>.</div></noscript>
+</body>
+</html>

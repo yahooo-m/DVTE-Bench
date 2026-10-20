@@ -1,0 +1,19 @@
+{
+  "verifiedDate": "2026-10-20",
+  "authoritativeProtocol": "Complete 1,631-video evaluation inside ground-truth pixel masks",
+  "sourcePipelineComplete": true,
+  "methods": 5,
+  "exactNumericalComparisons": 545,
+  "numericalMismatches": 0,
+  "publicDataUnchanged": true,
+  "embeddedResultsEqualStandalone": true,
+  "dataSha256": {
+    "results.json": "d63c3cbfdbe9ddfd17a5392c7d988b7fd36095a725764f9f415b617f12db05e5",
+    "benchmark.json": "f7a1deb1f8b5f4679f60de980b584056c837650577f961ee9940522dff5c2a4e"
+  },
+  "excludedFromThisPresentation": [
+    "Earlier box-region and whole-frame score tables",
+    "Separate four-step throughput probe"
+  ],
+  "qualitativeOutputProvenance": "../../model-previews.json"
+}
